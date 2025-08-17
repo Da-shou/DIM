@@ -21,7 +21,7 @@ utils.LOGTYPE_WARNING = "WARNING"
 
 -- Prints in a prettified format for nice logging
 function utils.log(content, type)
-    return print(("C%d@%s - %s : %s"):
+    return print(("C%d@%s %s: %s"):
         format(os.getComputerID(),utils.get_local_time(),type,content))
 end
 

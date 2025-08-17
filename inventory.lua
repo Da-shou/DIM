@@ -54,12 +54,17 @@ local progress = 0
 for i,name in ipairs(inv_names) do    
     local inventory = peripheral.wrap(name)
     for slot, item in pairs(inventory.list()) do
-        table.insert(storage,{
-                location = name,
-                name = item.name,
-                count = item.count,
-                slot = slot
-        })
+        local details = inventory.getItemDetail(slot)            
+        if details and details.name then
+            if not storage[details.name] then
+                storage[details.name] = {}
+            end
+            table.insert(storage[details.name], {
+                slot = slot,
+                source = name,
+                ["details"] = details
+            })
+        end
     end
     
     -- Logging progress

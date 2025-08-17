@@ -24,4 +24,9 @@ config.LOADING_MODULO = 7
 -- the informations about each and every item.
 config.DATABASE_FILE_PATH = "/dim/storage/db.json"
 
+-- The location and name of the JSON file containing the names
+-- of all the items in the game. Allows for indexed searching in
+-- the database.
+config.REGISTRY_MINECRAFT_ITEMS_PATH = "/dim/reg/minecraft.json"
+
 return config
