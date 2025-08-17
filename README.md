@@ -16,3 +16,4 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 - The last actions can be printed on paper.
 
 For balance reasons that I am the sole judge of, this is made to only work on wired networks.
+As an added bonus, I am challenging myself to online write this entire program on a basic computer, directly from the game.
