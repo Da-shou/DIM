@@ -9,11 +9,11 @@
 -- Created : 17/08/2025
 -- Updated : 17/08/2025
 
-local config = require("config")
-local utils = require("utils")
+local config = require("lib/config")
+local utils = require("lib/utils")
 
-local INFO = utils.LOGTYPE_INFO
-local ERROR = utils.LOGTYPE_ERROR
+local INFO = config.LOGTYPE_INFO
+local ERROR = config.LOGTYPE_ERROR
 local LM = config.LOADING_MODULO
 local INPUT = config.INPUT_STORAGE_NAME
 
@@ -24,7 +24,7 @@ local names = peripheral.getNames()
 -- their types is the storage type specifies, adds them
 -- to a list. Exception for the input inventory specified
 -- in the config file.
-function getInventories()
+function get_inventories()
     local results = {}
     for i,name in ipairs(names) do
         local type = peripheral.getType(name)
@@ -38,7 +38,7 @@ end
 utils.log("Searching for inventories on the network...", INFO)
 
 -- Getting the inventories and the count
-local inv_names, inv_count = getInventories()
+local inv_names, inv_count = get_inventories()
 
 -- Creating the lua object that will hold all of our
 -- item data which will then be serialized to JSON.
@@ -47,13 +47,26 @@ local storage = {}
 utils.log(("Now indexing storage with %d inventories...")
     :format(inv_count), INFO)
 
-local progress = 0
+local total_progress = 0
+local inventory_progress = 0
+local loading_index = 0
+
+local x,y = term.getCursorPos()
 
 -- Parsing every inventory and adding the item infos to the
 -- lua storage object.
 for i,name in ipairs(inv_names) do    
     local inventory = peripheral.wrap(name)
-    for slot, item in pairs(inventory.list()) do
+
+    -- Counting the items in the current inventory for loading
+    -- display.
+    local slot_count = 0
+    for _ in pairs(inventory.list()) do
+        slot_count = slot_count + 1
+    end
+
+    local current_slot_index = 0
+    for slot, _ in pairs(inventory.list()) do
         local details = inventory.getItemDetail(slot)            
         if details and details.name then
             if not storage[details.name] then
@@ -65,22 +78,35 @@ for i,name in ipairs(inv_names) do
                 ["details"] = details
             })
         end
-    end
-    
-    -- Logging progress
-    if math.mod(i,LM) == 0 then
-        progress = math.floor(((i-1)/inv_count)*100)
-        utils.log(("%d%% done."):format(progress), INFO)
+        
+        inventory_progress = ((current_slot_index)/slot_count-1)/table.getn(inv_names)
+        total_progress = ((inventory_progress) + (i / inv_count))*100
+
+        -- Logging progress
+        if math.mod(loading_index,LM) == 0 then
+            utils.log(("%.1f%% done."):format(total_progress), INFO)
+            term.clearLine()
+            term.setCursorPos(x,y)
+        end
+
+        current_slot_index = current_slot_index + 1
+        loading_index = loading_index + 1
     end
 end
 
+term.clearLine()
+term.setCursorPos(x,y)
+utils.log(("100% done."), INFO)
 utils.log("Indexing complete !", INFO)
 
 -- Serializing our lua object to JSON
 local JSON_DATABASE = textutils.serializeJSON(storage)
+local JSON_NAMES = textutils.serializeJSON(inv_names)
 
 -- The size of the database is the length of the string (duh)
-local db_size = string.len(JSON_DATABASE)
+local storage_size = string.len(JSON_DATABASE)
+local names_size = string.len(JSON_NAMES)
+local db_size = storage_size + names_size
 
 local unit_char = ""
 local unit_div = 1
@@ -102,6 +128,13 @@ if db_size >= fs.getFreeSpace("/dim") then
     return
 end
 
+-- Writing the database in the db.json file.
 local file = fs.open(config.DATABASE_FILE_PATH, "w")
 file.write(JSON_DATABASE)
+file.close()
+
+-- Writing the inventory names to a file for future use by other
+-- programs.
+local file = fs.open(config.INVENTORIES_FILE_PATH, "w")
+file.write(JSON_NAMES)
 file.close()

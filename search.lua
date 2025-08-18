@@ -1,7 +1,7 @@
 local config = require("config")
 local utils = require("utils")
 
-local INFO = utils.LOGTYPE_INFO
+local INFO = config.LOGTYPE_INFO
 
 -- Getting the search query
 local search_query = arg[1]
@@ -16,7 +16,6 @@ local candidates = {}
 
 for i,id in ipairs(itemreg) do    
     if string.find(id, search_query, 1, true) then
-        
         table.insert(candidates, id)
     end
 end
@@ -30,7 +29,9 @@ local database = textutils.unserializeJSON(db_content)
 for i,c in ipairs(candidates) do
     local item_type = database[c]
     if item_type then
+        local total = 0
         for i,item in ipairs(item_type) do
+            total = total + item.details.count
             utils.log(("%s - %d x %s at slot %d"):format(
                     item.source, 
                     item.details.count, 
@@ -38,5 +39,6 @@ for i,c in ipairs(candidates) do
                     item.slot
             ),INFO)        
         end
+        utils.log(("TOTAL COUNT : %d\n"):format(total), INFO)
     end
 end
