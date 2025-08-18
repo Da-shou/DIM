@@ -23,8 +23,7 @@ local INPUT = config.INPUT_STORAGE_NAME
 -- Getting the peripherals
 local names = peripheral.getNames()
 
-term.clear()
-term.setCursorPos(1,1)
+utils.reset_terminal()
 
 -- Parses through every peripherals in the network and if
 -- their types is the storage type specifies, adds them
@@ -126,35 +125,22 @@ local storage_size = string.len(JSON_DATABASE)
 local names_size = string.len(JSON_NAMES)
 local db_size = storage_size + names_size
 
-local unit_char = ""
-local unit_div = 1
-
--- Picking an adequate size for the size printing.
-if db_size >= 1000000 then
-    unit_char = "M"
-    unit_div = 1048576
-elseif db_size >= 1000 then
-    unit_char = "k"
-    unit_div = 1024
-end
-
-utils.log(("New database size is %.3f%sB."):format(db_size/unit_div, unit_char), INFO)
+local formatted_db_size = utils.check_db_size(db_size)
 
 -- Returning if there isn't enough space on the disk.
-if db_size >= fs.getFreeSpace("/dim") then
+if not formatted_db_size then
     utils.log("Not enough free space on disk left to save new database. Exiting...", ERROR)
     return
 end
 
--- Writing the database in the db.json file.
-local file = fs.open(config.DATABASE_FILE_PATH, "w")
-file.write(JSON_DATABASE)
-file.close()
+utils.log(("New item storage database size is %s"):format(formatted_db_size), INFO)
 
--- Writing the inventory names to a file for future use by other
+-- Writing the database to the JSON file.
+utils.write_json_string_in_file(config.DATABASE_FILE_PATH, JSON_DATABASE)
+
+-- Writing the inventory names to a JSON file for future use by other
 -- programs.
-local file = fs.open(config.INVENTORIES_FILE_PATH, "w")
-file.write(JSON_NAMES)
-file.close()
+utils.write_json_string_in_file(config.INVENTORIES_FILE_PATH, JSON_NAMES)
 
+-- End program
 utils.log("Inventory program successfully ended.", END)

@@ -10,24 +10,30 @@
 
 local config = {}
 
+-- Base path of the program
+config.BASE_PATH = "/dim"
+
+-- The location and name of the JSON file which will contain
+-- the informations about each and every item.
+config.DATABASE_FILE_PATH = config.BASE_PATH.."/storage/db.json"
+config.INVENTORIES_FILE_PATH = config.BASE_PATH.."/storage/inventories.json"
+-- The location and name of the JSON file containing the names
+-- of all the items in the game. Allows for indexed searching in
+-- the database.
+config.REGISTRY_MINECRAFT_ITEMS_PATH = config.BASE_PATH.."/reg/minecraft.json"
+
 -- The type of inventory to scan for
 config.STORAGE_TYPE = "minecraft:barrel"
+
+-- The number of slots of a storage system
+config.STORAGE_TYPE_SLOTS = 27
 
 -- The network name of the input inventory
 config.INPUT_STORAGE_NAME = "minecraft:barrel_204"
 
 -- The modulo value to set the frequency of loading updates.
 -- A higher value means less loading updates ; less screen clutter.
-config.LOADING_MODULO = 3
-
--- The location and name of the JSON file which will contain
--- the informations about each and every item.
-config.DATABASE_FILE_PATH = "/dim/storage/db.json"
-config.INVENTORIES_FILE_PATH = "/dim/storage/inventories.json"
--- The location and name of the JSON file containing the names
--- of all the items in the game. Allows for indexed searching in
--- the database.
-config.REGISTRY_MINECRAFT_ITEMS_PATH = "/dim/reg/minecraft.json"
+config.LOADING_MODULO = 1
 
 -- Logging types to sort the different messages to the user.
 config.LOGTYPE_DEBUG = "DEBUG"

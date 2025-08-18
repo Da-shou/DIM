@@ -1,1 +1,962 @@
-{"minecraft:piston":[{"details":{"name":"minecraft:piston","itemGroups":[{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{},"count":63,"maxCount":64,"displayName":"Piston"},"source":"minecraft:barrel_182","slot":9}],"minecraft:oak_log":[{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_181","slot":26},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_181","slot":27},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_182","slot":1},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_182","slot":2},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_182","slot":3},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_182","slot":4},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":64,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_182","slot":5},{"details":{"name":"minecraft:oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:oak_logs":true,"minecraft:logs_that_burn":true,"minecraft:completes_find_tree_tutorial":true,"minecraft:logs":true},"count":24,"maxCount":64,"displayName":"Oak Log"},"source":"minecraft:barrel_182","slot":6}],"minecraft:red_wool":[{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":1},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":2},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":3},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":4},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":5},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":6},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":7},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":8},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":9},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":10},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":11},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":12},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":13},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":14},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":15},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":16},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":17},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":18},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":19},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":20},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":21},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":22},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":23},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":24},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":25},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":26},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_180","slot":27},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":1},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":2},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":3},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":4},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":5},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":6},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":7},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":8},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":9},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":10},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":11},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":12},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":13},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":14},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":15},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":16},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":17},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":18},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":19},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":20},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":21},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":22},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":23},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":24},{"details":{"name":"minecraft:red_wool","itemGroups":[{"id":"minecraft:colored_blocks","displayName":"Colored Blocks"}],"tags":{"c:dyed/red":true,"c:dyed":true,"minecraft:dampens_vibrations":true,"minecraft:wool":true},"count":64,"maxCount":64,"displayName":"Red Wool"},"source":"minecraft:barrel_181","slot":25}],"minecraft:observer":[{"details":{"name":"minecraft:observer","itemGroups":[{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{},"count":64,"maxCount":64,"displayName":"Observer"},"source":"minecraft:barrel_182","slot":7}],"minecraft:lightning_rod":[{"details":{"name":"minecraft:lightning_rod","itemGroups":[{"id":"minecraft:functional_blocks","displayName":"Functional Blocks"},{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{},"count":64,"maxCount":64,"displayName":"Lightning Rod"},"source":"minecraft:barrel_182","slot":12}],"minecraft:target":[{"details":{"name":"minecraft:target","itemGroups":[{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{},"count":64,"maxCount":64,"displayName":"Target"},"source":"minecraft:barrel_182","slot":8}],"minecraft:composter":[{"details":{"name":"minecraft:composter","itemGroups":[{"id":"minecraft:functional_blocks","displayName":"Functional Blocks"},{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{"c:villager_job_sites":true},"count":60,"maxCount":64,"displayName":"Composter"},"source":"minecraft:barrel_182","slot":10}],"minecraft:enchanted_book":[{"details":{"enchantments":[{"level":4,"name":"minecraft:projectile_protection","displayName":"Projectile Protection IV"}],"name":"minecraft:enchanted_book","itemGroups":[{"id":"minecraft:ingredients","displayName":"Ingredients"}],"tags":{"minecraft:bookshelf_books":true},"count":1,"maxCount":1,"displayName":"Enchanted Book"},"source":"minecraft:barrel_174","slot":14}],"minecraft:pale_oak_log":[{"details":{"name":"minecraft:pale_oak_log","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"},{"id":"minecraft:natural_blocks","displayName":"Natural Blocks"}],"tags":{"minecraft:logs":true,"minecraft:logs_that_burn":true,"minecraft:pale_oak_logs":true,"minecraft:completes_find_tree_tutorial":true},"count":1,"maxCount":64,"displayName":"Pale Oak Log"},"source":"minecraft:barrel_183","slot":1}],"minecraft:oak_planks":[{"details":{"name":"minecraft:oak_planks","itemGroups":[{"id":"minecraft:building_blocks","displayName":"Building Blocks"}],"tags":{"minecraft:wooden_tool_materials":true,"minecraft:planks":true},"count":64,"maxCount":64,"displayName":"Oak Planks"},"source":"minecraft:barrel_182","slot":14}],"minecraft:hopper":[{"details":{"name":"minecraft:hopper","itemGroups":[{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{},"count":64,"maxCount":64,"displayName":"Hopper"},"source":"minecraft:barrel_182","slot":13}],"minecraft:jukebox":[{"details":{"name":"minecraft:jukebox","itemGroups":[{"id":"minecraft:functional_blocks","displayName":"Functional Blocks"},{"id":"minecraft:redstone_blocks","displayName":"Redstone Blocks"}],"tags":{},"count":64,"maxCount":64,"displayName":"Jukebox"},"source":"minecraft:barrel_182","slot":11}]}
+{
+    "minecraft:green_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:green_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed": true,
+                    "c:dyed/green": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Green Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 17
+        }
+    ],
+    "minecraft:light_blue_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:light_blue_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed": true,
+                    "c:dyed/light_blue": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Light Blue Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 18
+        }
+    ],
+    "minecraft:oak_planks": [
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 1
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 2
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 3
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 4
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 5
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 6
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 7
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 8
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 9
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 10
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 11
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 12
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 13
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 14
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 15
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 16
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 17
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 18
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 19
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 20
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 21
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 22
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 23
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 24
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 25
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 26
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:wooden_tool_materials": true,
+                    "minecraft:planks": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_180",
+            "slot": 27
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 2
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 3
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 4
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 5
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 6
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 7
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 8
+        },
+        {
+            "details": {
+                "name": "minecraft:oak_planks",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:planks": true,
+                    "minecraft:wooden_tool_materials": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Planks"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 9
+        }
+    ],
+    "minecraft:brown_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:brown_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed": true,
+                    "c:dyed/brown": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Brown Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 11
+        }
+    ],
+    "minecraft:red_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:red_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed": true,
+                    "c:dyed/red": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Red Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 13
+        },
+        {
+            "details": {
+                "name": "minecraft:red_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed": true,
+                    "c:dyed/red": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Red Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 14
+        }
+    ],
+    "minecraft:light_gray_wool": [
+        {
+            "details": {
+                "name": "minecraft:light_gray_wool",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "c:dyed": true,
+                    "minecraft:dampens_vibrations": true,
+                    "c:dyed/light_gray": true,
+                    "minecraft:wool": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Light Gray Wool"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 10
+        }
+    ],
+    "minecraft:yellow_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:yellow_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed": true,
+                    "c:dyed/yellow": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Yellow Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 19
+        }
+    ],
+    "minecraft:lime_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:lime_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed/lime": true,
+                    "c:dyed": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Lime Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 15
+        }
+    ],
+    "minecraft:oak_log": [
+        {
+            "details": {
+                "name": "minecraft:oak_log",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:building_blocks",
+                        "displayName": "Building Blocks"
+                    },
+                    {
+                        "id": "minecraft:natural_blocks",
+                        "displayName": "Natural Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:oak_logs": true,
+                    "minecraft:logs_that_burn": true,
+                    "minecraft:completes_find_tree_tutorial": true,
+                    "minecraft:logs": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Oak Log"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 20
+        }
+    ],
+    "minecraft:black_wool": [
+        {
+            "details": {
+                "name": "minecraft:black_wool",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "c:dyed/black": true,
+                    "minecraft:dampens_vibrations": true,
+                    "c:dyed": true,
+                    "minecraft:wool": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Black Wool"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 12
+        }
+    ],
+    "minecraft:cyan_terracotta": [
+        {
+            "details": {
+                "name": "minecraft:cyan_terracotta",
+                "itemGroups": [
+                    {
+                        "id": "minecraft:colored_blocks",
+                        "displayName": "Colored Blocks"
+                    }
+                ],
+                "tags": {
+                    "minecraft:terracotta": true,
+                    "c:dyed/cyan": true,
+                    "c:dyed": true
+                },
+                "count": 64,
+                "maxCount": 64,
+                "displayName": "Cyan Terracotta"
+            },
+            "source": "minecraft:barrel_181",
+            "slot": 16
+        }
+    ]
+}
