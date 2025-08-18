@@ -160,4 +160,3 @@ else
 end
 
 utils.log("Insertion ended successfully.", END)
-

@@ -19,7 +19,11 @@ end
 -- Prints in a prettified format for nice logging
 function utils.log(content, type)
     for _, allowed_type in ipairs(config.displayed_logtypes) do        
-        if type == allowed_type then
+        if type == config.LOGTYPE_ERROR then
+            printError(("C%d@%s %s> %s"):
+                format(os.getComputerID(),utils.get_local_time(),type,content))
+            break
+        elseif type == allowed_type then
             print(("C%d@%s %s> %s"):
                 format(os.getComputerID(),utils.get_local_time(),type,content))
             break
