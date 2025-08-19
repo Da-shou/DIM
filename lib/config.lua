@@ -6,7 +6,7 @@
 -- that are shared between the files.
 
 -- Created : 17/08/2025
--- Updated : 17/08/2025
+-- Updated : 19/08/2025
 
 local config = {}
 
@@ -34,14 +34,16 @@ config.STORAGE_TYPE = "minecraft:barrel"
 -- The number of slots of a storage system
 config.STORAGE_TYPE_SLOTS = 27
 
--- The network name of the input inventory
+-- The network name of the insertion inventory
 config.INPUT_STORAGE_NAME = "minecraft:barrel_204"
+-- The network name of the extraction inventory
+config.OUTPUT_STORAGE_NAME = "minecraft:barrel_205"
 
+config.MIN_EXTRACTION_REQUEST_COUNT = 1
+config.MAX_EXTRACTION_REQUEST_COUNT = 1728 -- 64 x 27
 -- The modulo value to set the frequency of loading updates.
 -- A higher value means less loading updates ; less screen clutter.
 config.LOADING_MODULO = 1
-
-config.MAX_DISPLAY_NAME_STRING_LENGTH = 25
 
 -- Logging types to sort the different messages to the user.
 config.LOGTYPE_DEBUG = "DEBUG"

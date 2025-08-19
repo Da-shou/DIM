@@ -142,9 +142,37 @@ function utils.write_json_string_in_file(path, object)
     return true
 end
 
+-- Pads the string with left or right spacing
+local function padCell(text, width, rightAlign)
+    local text_len = string.len(text)
+    if text_len > width then
+        -- truncate if too long
+        text = text:sub(1, width)
+    end
+
+    if rightAlign then
+        return string.rep(" ", width - text_len)..text
+    else
+        return text..string.rep(" ", width - text_len)
+    end
+end
+
+-- Custom tabulate function allowing for custom widths of colums.
+local function tabulate_fixed(rows, widths, rightAlign)
+    for _, row in ipairs(rows) do
+        local out = {}
+        for i, cell in ipairs(row) do
+            local w = widths[i] or 8  -- default width
+            local r = rightAlign and rightAlign[i] or false
+            table.insert(out, padCell(cell, w, r))
+        end
+        print(table.concat(out, " ")) -- space between cols
+    end
+end
+
 -- Allows for a paged tabulated print of a table because the one
--- that ships with ComputerCraft does not work ?
-function utils.paged_tabulate(data, headers, spacing)
+-- that ships with ComputerCraft is complete dogshit
+function utils.paged_tabulate_fixed(data, headers, spacing, widths, rightAlign)
     local _, h = term.getSize()
 
     -- Space for the headers + spacing + rows.
@@ -181,11 +209,11 @@ function utils.paged_tabulate(data, headers, spacing)
         count = count + h_space_rows
 
         -- Display the paged results
-        textutils.tabulate(table.unpack(current_page_rows))
+        tabulate_fixed(current_page_rows, widths, rightAlign)
 
         print()
         utils.log(("%d results shown - Page %d/%d"):format(
-            table.getn(current_page_rows),
+            table.getn(current_page_rows) - 2,
             current_page, 
             nb_page_needed), 
             config.LOGTYPE_INFO)
@@ -212,4 +240,75 @@ function utils.prepare_registries()
     return registry
 end
 
+function utils.search_database_for_item(database, name, detailed_output, nbt)
+    local detailed_results = {}
+    local item_type = database[name]
+
+    if item_type then
+        local item_type_stacks = item_type["stacks"]
+        local total = 0
+        local display_name = nil
+        local has_nbt = "NO"
+
+        for _,stack in ipairs(item_type_stacks) do
+            if nbt then
+                has_nbt = "YES"
+            end
+
+            if not nbt or stack.details.nbt == nbt then
+                display_name = stack.details.displayName
+                total = total + stack.details.count
+                if detailed_output then
+                    -- Removing the first part of the id to only get the name and
+                    -- id of storage.
+                    local source = stack.source:match(":(.*)") or stack.source
+
+                    
+                    table.insert(detailed_results,{
+                        source,
+                        "@",
+                        stack.slot,
+                        display_name,
+                        "x",
+                        stack.details.count
+                    })
+                end
+            end
+        end
+
+        if not detailed_output then
+            return {total, "x", display_name, has_nbt}
+        else
+            return detailed_results
+        end
+    end
+end
+
+function utils.add_stack_to_db(database, section, slot, inv_name, details)
+    if not database then return end
+
+    local section_name = section
+
+    if not database[section_name] then
+        database[section_name] = {}
+    end
+
+    if not database[section_name]["nbt"] then
+        database[section_name]["nbt"] = {}
+    end
+
+    if details.nbt then
+        table.insert(database[section_name]["nbt"], details.nbt)
+    end
+
+    if not database[section_name]["stacks"] then
+        database[section_name]["stacks"] = {}
+    end
+
+    table.insert(database[section_name]["stacks"],{
+            slot = slot,
+            source = inv_name,
+            ["details"] = details
+    })
+end
 return utils

@@ -4,19 +4,20 @@
 
 -- When this program is called, the database is browsed
 -- to see if an item corresponding to the query is found.
+-- Usage : search <query[string]> <display_details[true|false]
 
 -- Created : 17/08/2025
--- Updated : 18/08/2025
+-- Updated : 19/08/2025
 
 local config = require("lib/config")
 local utils = require("lib/utils")
 
 local INFO = config.LOGTYPE_INFO
 local BEGIN = config.LOGTYPE_BEGIN
+
 local END = config.LOGTYPE_END
 local WARN = config.LOGTYPE_WARNING
 local ERROR = config.LOGTYPE_ERROR
-local DEBUG = config.LOGTYPE_DEBUG
 
 utils.reset_terminal()
 
@@ -50,7 +51,7 @@ local itemreg = utils.prepare_registries()
 local candidates = {}
 
 for _,id in ipairs(itemreg) do  
-    if string.find(id, search_query, 1, true) then
+    if string.find(string.lower(id), string.lower(search_query), 1, true) then
         table.insert(candidates, id)
     end
 end
@@ -63,65 +64,69 @@ if not database then return end
 -- Will contain the informations about the items.
 local display_list = {}
 
--- Used to add a number to the rows when displayed without details.
-local item_index = 0
-local display_name = nil
-local total = 0
-
 -- Iterate over every possible item type that matches the search
 for _,c in ipairs(candidates) do
-    local item_type = database[c]
-
-    -- Resetting the total item count and display_name to 0
-    display_name = nil
-    total = 0
-    
-    if item_type then
-        -- For each stack of items of specified type.
-        for _,item in ipairs(item_type) do
-            -- Add their count to the total.
-            total = total + item.details.count
-            display_name = item.details.displayName
-            
-            -- If details are enabled, insert line that will show in which slot
-            -- and which storage the stack is located. The total is not displayed.
-            if display_details then
-                table.insert(display_list, {item.source.." @ slot "..item.slot.." - "..display_name.." x "..item.details.count})
+    if database[c] then
+        if database[c]["nbt"] then
+            for _,nbt in ipairs(database[c]["nbt"]) do
+                table.insert(display_list, (utils.search_database_for_item(database, c, display_details, nbt)))
             end
+        else
+            table.insert(display_list, (utils.search_database_for_item(database, c, display_details)))
         end
-        
-        -- If the detailed display is deactivated, create a row with the index, 
-        -- display name and total of each type of item.
-        if not display_details then
-            if string.len(display_name) > config.MAX_DISPLAY_NAME_STRING_LENGTH then
-                display_name = string.sub(display_name, 1, config.MAX_DISPLAY_NAME_STRING_LENGTH)
-                display_name = display_name.."..."
-            end
-            table.insert(display_list, {item_index, display_name, total})
-        end
-        item_index = item_index + 1
     end
 end
 
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
-    local rows = {}
+    local best_displayname_width = 0
+
+    -- Inserting id and finding optimal width size for name column.
+    for i, row in ipairs(display_list) do
+        table.insert(row, 1, i)
+
+        local w = 0
+
+        if display_details then
+            w = string.len(row[2][4])
+        else
+            w = string.len(row[4])
+        end
+
+        if w > best_displayname_width then
+            best_displayname_width = w
+        end
+    end
+
     if display_details then
+        local detailed_rows = {}
         for _, row in ipairs(display_list) do
-            table.insert(rows, {row[1]})
+            table.insert(detailed_rows, {
+                row[1], 
+                row[2][1], 
+                row[2][2],
+                row[2][3],
+                row[2][4],
+                row[2][5],
+                row[2][6],
+            })
         end
 
         -- Setting the columns names and the white space.
-        utils.paged_tabulate(rows,  {("Detailed results of search query <%s>"):format(search_query)}, {""})
+        utils.paged_tabulate_fixed(
+            detailed_rows,
+            {"<#>","<Storage>", "@", "<s>", "<Name>", "x", "<Qty>"}, 
+            {"","","","","","",""},
+            {3,11,1,3,best_displayname_width,1,5},
+            {false,false,true,false,false,true,false,false}
+        )
     else
-        for _, row in ipairs(display_list) do
-            table.insert(rows, {row[1], row[2], row[3]})
-        end
-
-        utils.paged_tabulate(
-            rows, 
-            {"<#>", "<Name>", "<Quantity>"}, 
-            {"", "", ""}
+        utils.paged_tabulate_fixed(
+            display_list, 
+            {"<#>", "<Qty>", "x", "<Name>", "<NBT?>"}, 
+            {"", "", "", "", ""},
+            {4,5,1,best_displayname_width,6},
+            {false,true,false,false}
         )
     end
 else

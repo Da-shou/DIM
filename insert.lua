@@ -21,19 +21,14 @@ local BEGIN = config.LOGTYPE_BEGIN
 local INFO = config.LOGTYPE_INFO
 local END = config.LOGTYPE_END
 
--- Getting JSON files
-local IN = config.INPUT_STORAGE_NAME
-local DB = config.DATABASE_FILE_PATH
-
 utils.reset_terminal()
-
-local _, y_max = term.getSize()
 
 -- Program startup
 utils.log("Beginning insertion...", BEGIN)
 utils.log("Scanning contents of desired input storage...", DEBUG)
 
--- Getting the input inventory ready
+-- Getting the insertion inventory ready
+local IN = config.INPUT_STORAGE_NAME
 local input = peripheral.wrap(IN)
 local input_stacks = input.list()
 
@@ -80,6 +75,9 @@ function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
     local size = inv.size()
     local inv_name = peripheral.getName(inv)    
     
+    -- If the max_stack_size is 1, no need to search for partial slots.
+    if (max_stack_size == 1) then goto empty_slot_search end
+
     -- Iterating on the items in the output inventory and
     -- try to find a partial stack containing the same item.
     -- This is done first to try to complete a stack rather than using
@@ -101,7 +99,7 @@ function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
             -- items into the stack.
             return slot, space_left
         end
-        -- To be able to continue in this loop. 
+        -- To be able to continue in the loop. 
         -- Please add a continue statement Lua
         ::continue::
     end
@@ -109,6 +107,7 @@ function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
     -- Logs if no partial storages were found.
     utils.log(("Didn't find a partially filled slot in %s. Looking for empty slots..."):format(peripheral.getName(inv)), DEBUG)
     
+    ::empty_slot_search::
     -- Checks for empty slots now since no partial slots
     -- were found in inventory.
     for slot = 1, size do
@@ -131,20 +130,6 @@ end
 if is_input_empty() then
     utils.log("No items in the input storage.", ERROR)
     return
-end
-
-function add_stack_to_db(section, slot, inv_name, details)
-    if not db then return end
-
-    if not db[section] then
-        db[section] = {}
-    end
-
-    table.insert(db[section],{
-            slot = slot,
-            source = inv_name,
-            ["details"] = details
-    })
 end
 
 local incomplete_storing = true
@@ -173,6 +158,7 @@ for input_slot, input_stack in pairs(input_stacks) do
             local stack_details = input.getItemDetail(input_slot) 
 
             local item_nbt = nil;
+
             if stack_details.nbt then
                 item_nbt = stack_details.nbt
             end
@@ -242,7 +228,8 @@ for input_slot, input_stack in pairs(input_stacks) do
                     -- This does both.
                     
                     utils.log(("Adding new stack of %d x %s to the JSON database"):format(stack_details.count, stack_details.name), DEBUG)
-                    add_stack_to_db(
+                    utils.add_stack_to_db(
+                        db,
                         stack_details.name, 
                         output_slot, 
                         output_name, 

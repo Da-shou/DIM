@@ -76,16 +76,10 @@ for i,name in ipairs(inv_names) do
     local emptyInv = true
     for slot, _ in pairs(inventory.list()) do
         emptyInv = false
-        local details = inventory.getItemDetail(slot)            
+        local details = inventory.getItemDetail(slot)
+        
         if details and details.name then
-            if not storage[details.name] then
-                storage[details.name] = {}
-            end
-            table.insert(storage[details.name], {
-                slot = slot,
-                source = name,
-                ["details"] = details
-            })
+            utils.add_stack_to_db(storage,details.name,slot,name,details)
         end
 
         inventory_progress = ((current_slot_index)/slot_count-1)/table.getn(inv_names)
