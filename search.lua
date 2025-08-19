@@ -87,11 +87,15 @@ for _,c in ipairs(candidates) do
     end
 end
 
+local function sort_results(t, field)
+    table.sort(t, function(a,b) return a[field] > b[field] end)
+end
+
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
     local best = 0
 
-    -- Inserting id and finding optimal width size for name column.
+    -- Finding optimal width size for name column.
     for i, row in ipairs(display_list) do
         local w = 0
         
@@ -100,11 +104,9 @@ if table.getn(display_list) > 0 then
         if display_details then
             for _,line in ipairs(row) do
                 w = string.len(line[4])
-                table.insert(line, 1, i)
             end
         else
-            table.insert(row, 1, i)
-            w = string.len(row[2])
+            w = string.len(row[1])
         end
 
         -- Updating maximum
@@ -120,8 +122,9 @@ if table.getn(display_list) > 0 then
         local detailed_rows = {}
 
         -- Extract lines from the groups returned by search_database_for_item
-        for _,group in ipairs(display_list) do
-            for _,line in ipairs(group) do
+        for i,group in ipairs(display_list) do
+            for j,line in ipairs(group) do
+                table.insert(line, 1, i)
                 table.insert(detailed_rows, line)
             end
         end
@@ -134,7 +137,15 @@ if table.getn(display_list) > 0 then
             {false,true,false,false,false,false,false,false,}
         )
     else
-        -- Print simple display
+        -- Sort results by quantity if search all
+        if search_all then 
+            sort_results(display_list, 3)
+        end
+
+        for i,row in ipairs(display_list) do
+            table.insert(row, 1, i)
+        end
+    
         utils.paged_tabulate_fixed(
             display_list, 
             {"<#>", "<Name>", "x", "<Qty>"}, 

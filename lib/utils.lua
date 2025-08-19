@@ -193,7 +193,9 @@ end
 -- widths[{number,...}]        : width for each column
 -- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
 function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
-    local _, h = term.getSize()
+    local w, h = term.getSize()
+
+    utils.reset_terminal()
 
     -- Space for the headers + spacing + rows.
     local h_space = h-5
@@ -210,7 +212,6 @@ function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
 
     for current_page = 1, nb_page_needed do
         -- Clears
-        utils.reset_terminal()
         current_page_rows = {}
 
         -- Fill current page array with rows
@@ -224,8 +225,8 @@ function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
 
         local spacing = {}
         
-        for _=0, table.getn(headers) do
-            table.insert(spacing,"")
+        for _=1, table.getn(headers) do
+            table.insert(spacing,string.rep("-",w))
         end
 
         -- Add column names and spacing at start
@@ -248,11 +249,19 @@ function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
             config.LOGTYPE_INFO)
 
         -- If this was the last page, leave
-        if (current_page == nb_page_needed) then return end
+        if (current_page == nb_page_needed) then 
+            -- Prompt the user to hit a key before showing next page.
+            utils.log(("Last page reached. Press any key to exit search..."), config.LOGTYPE_INFO)
+            os.pullEvent("key")
+            utils.reset_terminal()
+            return
+        end
 
         -- Prompt the user to hit a key before showing next page.
         utils.log(("%s"):format(PAGED_TABULATE_MESSAGE), config.LOGTYPE_INFO)
         os.pullEvent("key")
+
+        utils.reset_terminal()
     end
 end
 

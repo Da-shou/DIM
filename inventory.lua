@@ -17,8 +17,11 @@ local ERROR = config.LOGTYPE_ERROR
 local DEBUG = config.LOGTYPE_DEBUG
 local BEGIN = config.LOGTYPE_BEGIN
 local END = config.LOGTYPE_END
+
 local LM = config.LOADING_MODULO
+
 local INPUT = config.INPUT_STORAGE_NAME
+local OUTPUT = config.OUTPUT_STORAGE_NAME
 
 -- Getting the peripherals
 local names = peripheral.getNames()
@@ -33,7 +36,7 @@ function get_inventories()
     local results = {}
     for i,name in ipairs(names) do
         local type = peripheral.getType(name)
-        if type == config.STORAGE_TYPE and name ~= INPUT then
+        if type == config.STORAGE_TYPE and name ~= INPUT and name ~= OUTPUT then
             table.insert(results, name)
         end     
     end
@@ -63,7 +66,7 @@ local x,y = term.getCursorPos()
 -- lua storage object.
 for i,name in ipairs(inv_names) do    
     local inventory = peripheral.wrap(name)
-    local inventories_count = #inv_names
+    local inventories_count = table.getn(inv_names)
 
     -- Counting the items in the current inventory for loading
     -- display.
