@@ -21,6 +21,12 @@ config.INVENTORIES_FILE_PATH = config.BASE_PATH.."/storage/inventories.json"
 -- of all the items in the game. Allows for indexed searching in
 -- the database.
 config.REGISTRY_MINECRAFT_ITEMS_PATH = config.BASE_PATH.."/reg/minecraft.json"
+config.REGISTRY_COMPUTERCRAFT_ITEMS_PATH = config.BASE_PATH.."/reg/computercraft.json"
+
+config.REG_PATHS = {
+    config.REGISTRY_MINECRAFT_ITEMS_PATH,
+    config.REGISTRY_COMPUTERCRAFT_ITEMS_PATH
+}
 
 -- The type of inventory to scan for
 config.STORAGE_TYPE = "minecraft:barrel"

@@ -43,9 +43,9 @@ end
 utils.log(("Starting search program with search query <%s>"):format(search_query), BEGIN)
 utils.log("Now searching...", INFO)
 
--- Opening the minecraft item ID list and storing it in a lua
+-- Opening the item ID list and storing it in a lua
 -- object called itemreg
-local itemreg = utils.get_json_file_as_object(config.REGISTRY_MINECRAFT_ITEMS_PATH)
+local itemreg = utils.prepare_registries()
 
 local candidates = {}
 
@@ -86,9 +86,7 @@ for _,c in ipairs(candidates) do
             -- If details are enabled, insert line that will show in which slot
             -- and which storage the stack is located. The total is not displayed.
             if display_details then
-                -- Removing "minecraft:" in front of the source to shorten the output.
-                local source = string.sub(item.source,11,string.len(item.source))
-                table.insert(display_list, {source.." @ slot "..item.slot.." - "..display_name.." x "..item.details.count})
+                table.insert(display_list, {item.source.." @ slot "..item.slot.." - "..display_name.." x "..item.details.count})
             end
         end
         

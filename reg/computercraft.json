@@ -1,0 +1,23 @@
+[
+    "computercraft:computer_normal",
+    "computercraft:computer_advanced",
+    "computercraft:turtle_normal",
+    "computercraft:turtle_advanced",
+    "computercraft:pocket_computer_normal",
+    "computercraft:pocket_computer_advanced",
+    "computercraft:wireless_modem_normal",
+    "computercraft:wireless_modem_advanced",
+    "computercraft:cable",
+    "computercraft:wired_modem",
+    "computercraft:wired_modem_full",
+    "computercraft:redstone_relay",
+    "computercraft:monitor_normal",
+    "computercraft:monitor_advanced",
+    "computercraft:speaker",
+    "computercraft:printer",
+    "computercraft:printed_page",
+    "computercraft:printed_pages",
+    "computercraft:printed_book",
+    "computercraft:disk_drive",
+    "computercraft:disk"
+]

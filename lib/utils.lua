@@ -199,5 +199,17 @@ function utils.paged_tabulate(data, headers, spacing)
     end
 end
 
+-- Returns a lua obejct containing all of the id contained in the
+-- files at the path mentioned in the config file.
+function utils.prepare_registries()
+    local registry = {}
+    for _,path in ipairs(config.REG_PATHS) do
+        local reg = utils.get_json_file_as_object(path)
+        for _,s in ipairs(reg) do
+            table.insert(registry, s)
+        end
+    end
+    return registry
+end
 
 return utils
