@@ -106,7 +106,7 @@ for _,c in ipairs(candidates) do
 end
 
 -- Choose what to display based on the state of the display_details boolean.
-if table.getn(display_list) then
+if table.getn(display_list) > 0 then
     local rows = {}
     if display_details then
         for _, row in ipairs(display_list) do
@@ -127,9 +127,7 @@ if table.getn(display_list) then
         )
     end
 else
-    utils.log(("No results have been found for your search query <%s>"):format(search_query))
+    utils.log(("No results have been found for your search query <%s>"):format(search_query), INFO)
 end
 
-
-print()
 utils.log(("Search program ended.\n"):format(search_query), END)
