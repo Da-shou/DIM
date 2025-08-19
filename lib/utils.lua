@@ -20,7 +20,6 @@ function utils.reset_terminal()
     term.setCursorPos(1,1)
 end
 
-
 -- Return a string containing the local time from 
 -- the computer running the game in a 12-hour format.
 function utils.get_local_time()
@@ -28,6 +27,8 @@ function utils.get_local_time()
 end
 
 -- Prints in a prettified format for nice logging
+-- content[string] : content to show on screen
+-- type[config.displayed_logtypes] : logtype to show on screen, before log.
 function utils.log(content, type)
     for _, allowed_type in ipairs(config.displayed_logtypes) do        
         if type == config.LOGTYPE_ERROR then
@@ -45,6 +46,7 @@ end
 -- Is used to check if the new database size is writable on disk.
 -- Returns the size of the database with unit added and a boolean
 -- indicating if there is enough storage for the database.
+-- size[number] : size in bytes.
 function utils.check_db_size(size)
     local unit_char = ""
     local unit_div = 1
@@ -68,10 +70,11 @@ function utils.check_db_size(size)
     return formatted_size, size >= fs.getFreeSpace(config.BASE_PATH)
 end
 
-
 -- Safely opens a file and display a warning if en error occurs.
 -- Returns the file handle is successful
 -- Returns nil if an error occured.
+-- path[string] : file path.
+-- mode[string] : in which mod to open the file. ("w","r", etc...)
 function utils.open_file(path, mode)
     local file, e = fs.open(path, mode)
     if not file then
@@ -85,6 +88,8 @@ end
 -- Safely writes on a file and display a warning if en error occurs.
 -- Returns true if successful
 -- Returns false if an error occured.
+-- file_handle[Handle]  : Handle pointing to the opened file.
+-- content[string]      : string to write to the file.
 function utils.write_file(file_handle, content)
     -- No error managing ? Need to investigate
     file_handle.write(content)
@@ -94,6 +99,7 @@ end
 -- Safely closes a file and display a warning if en error occurs.
 -- Returns true if successful
 -- Returns false if an error occured.
+-- file_handle[Handle]  : Handle pointing to the opened file.
 function utils.close_file(file_handle)
     -- No error managing ? Need to investigate
     file_handle.close()
@@ -103,6 +109,7 @@ end
 -- Safely gets content of JSON file as lua object.
 -- Returns false if an error occured.
 -- Return true otherwise.
+-- path[string] : path to the JSON file.
 function utils.get_json_file_as_object(path)
     local file = utils.open_file(path, "r")
     if not file then return false end
@@ -128,7 +135,10 @@ function utils.get_json_file_as_object(path)
 end
 
 -- Write a string containing JSON to the file at specified path.
--- Returns true if successfull, false otherwise.
+-- Returns true if successful, false otherwise.
+-- CAUTION : This overwrites the JSON file !
+-- path[string]     : path to the JSON file that will be written in.
+-- object[string]   : JSON-Serialized string to be written in the file.
 function utils.write_json_string_in_file(path, object)
     local file = utils.open_file(path, "w")
     if not file then return false end
@@ -143,6 +153,9 @@ function utils.write_json_string_in_file(path, object)
 end
 
 -- Pads the string with left or right spacing
+-- text[string]         : string to be padded.
+-- width[string]        : how many spaces of padding.
+-- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
 local function padCell(text, width, rightAlign)
     local text_len = string.len(text)
     if text_len > width then
@@ -158,6 +171,9 @@ local function padCell(text, width, rightAlign)
 end
 
 -- Custom tabulate function allowing for custom widths of colums.
+-- rows[{{s1,s2},{s3,s4},...}] : table of strings to be printed.
+-- widths[{number,...}]        : width for each column
+-- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
 local function tabulate_fixed(rows, widths, rightAlign)
     for _, row in ipairs(rows) do
         local out = {}
@@ -172,7 +188,11 @@ end
 
 -- Allows for a paged tabulated print of a table because the one
 -- that ships with ComputerCraft is complete dogshit
-function utils.paged_tabulate_fixed(data, headers, spacing, widths, rightAlign)
+-- rows[{{s1,s2},{s3,s4},...}] : Table of strings to be printed.
+-- headers[{string,...}]       : Names of the headers of each columns.
+-- widths[{number,...}]        : width for each column
+-- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
+function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
     local _, h = term.getSize()
 
     -- Space for the headers + spacing + rows.
@@ -201,8 +221,16 @@ function utils.paged_tabulate_fixed(data, headers, spacing, widths, rightAlign)
             end
         end
 
+        local spacing = {}
+        
+        for _=0, table.getn(headers) do
+            table.insert(spacing,"")
+        end
+
         -- Add column names and spacing at start
         table.insert(current_page_rows, 1, spacing)
+
+
         table.insert(current_page_rows, 1, headers)
 
         -- Update the row counter
@@ -240,6 +268,17 @@ function utils.prepare_registries()
     return registry
 end
 
+-- Search for an item in the JSON database.
+-- Has two modes, depending on the value of detailed_output.
+-- If true, returns ONE object containing the display 
+-- name and total count of said item.
+-- If false, returns a TABLE of the 
+-- informations about each separate stack of said item.
+--
+-- database[Object]         : Lua object taken from the JSON file.
+-- name[string]             : Name (ID) of the item being searched.
+-- detailed_output[boolean] : Changes the output to detailed results if true.
+-- nbt[string]              : NBT string if stack has one. Can be nil. 
 function utils.search_database_for_item(database, name, detailed_output, nbt)
     local detailed_results = {}
     local item_type = database[name]
@@ -248,67 +287,70 @@ function utils.search_database_for_item(database, name, detailed_output, nbt)
         local item_type_stacks = item_type["stacks"]
         local total = 0
         local display_name = nil
-        local has_nbt = "NO"
 
         for _,stack in ipairs(item_type_stacks) do
-            if nbt then
-                has_nbt = "YES"
-            end
-
             if not nbt or stack.details.nbt == nbt then
                 display_name = stack.details.displayName
                 total = total + stack.details.count
+                
                 if detailed_output then
                     -- Removing the first part of the id to only get the name and
                     -- id of storage.
                     local source = stack.source:match(":(.*)") or stack.source
 
-                    
                     table.insert(detailed_results,{
                         source,
                         "@",
                         stack.slot,
-                        display_name,
+                        name,
                         "x",
-                        stack.details.count
+                        stack.details.count,
+                        nbt
                     })
                 end
             end
         end
 
         if not detailed_output then
-            return {total, "x", display_name, has_nbt}
+            return {display_name, "x", total}
         else
             return detailed_results
         end
     end
 end
 
+-- Adds a stack of items to the JSON database. Is used when a new empty slot is
+-- filled with items.
+--
+-- database[Object]     : Lua object taken from the JSON file.
+-- section[string]      : Name (ID) of the item being added.
+-- slot[number]         : Slot of the storage where the stack is stored in-game.
+-- inv_name[string]     : Name of the inventory where the stack is stored.
+-- details[Object]      : Object containing item details from getItemDetail
 function utils.add_stack_to_db(database, section, slot, inv_name, details)
     if not database then return end
 
     local section_name = section
 
+    -- Checking if item has a section, if not, create it with
+    -- both the stacks and nbt groups.
     if not database[section_name] then
         database[section_name] = {}
-    end
-
-    if not database[section_name]["nbt"] then
+        database[section_name]["stacks"] = {}
         database[section_name]["nbt"] = {}
     end
 
+    -- Insert the NBT of the current object to the nbt table.
     if details.nbt then
         table.insert(database[section_name]["nbt"], details.nbt)
     end
 
-    if not database[section_name]["stacks"] then
-        database[section_name]["stacks"] = {}
-    end
-
+    -- Insert the information about the current stack to the stack table.
     table.insert(database[section_name]["stacks"],{
             slot = slot,
             source = inv_name,
             ["details"] = details
     })
 end
+
 return utils

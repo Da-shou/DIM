@@ -14,7 +14,7 @@ local utils = require("lib/utils")
 
 local INFO = config.LOGTYPE_INFO
 local BEGIN = config.LOGTYPE_BEGIN
-
+local DEBUG = config.LOGTYPE_BEGIN
 local END = config.LOGTYPE_END
 local WARN = config.LOGTYPE_WARNING
 local ERROR = config.LOGTYPE_ERROR
@@ -61,14 +61,17 @@ end
 local database = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
 if not database then return end
 
--- Will contain the informations about the items.
+-- Will contain the informations about the items returned from the search.
 local display_list = {}
 
 -- Iterate over every possible item type that matches the search
 for _,c in ipairs(candidates) do
-    if database[c] then
-        if database[c]["nbt"] then
-            for _,nbt in ipairs(database[c]["nbt"]) do
+    local section = database[c]
+    if section then
+        local section_nbt = section["nbt"]
+        if section_nbt and table.getn(section_nbt) > 0 then
+            for _,nbt in ipairs(section_nbt) do
+                utils.log(("Searching item with NBT %s"):format(nbt), DEBUG)
                 table.insert(display_list, (utils.search_database_for_item(database, c, display_details, nbt)))
             end
         else
@@ -79,54 +82,55 @@ end
 
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
-    local best_displayname_width = 0
+    local best_name_width = 0
 
     -- Inserting id and finding optimal width size for name column.
     for i, row in ipairs(display_list) do
-        table.insert(row, 1, i)
-
         local w = 0
-
+        
+        -- Finding the longest name or display name, depending on
+        -- the state of display_details
         if display_details then
-            w = string.len(row[2][4])
+            for _,line in ipairs(row) do
+                w = string.len(line[4])
+                table.insert(line, 1, i)
+            end
         else
-            w = string.len(row[4])
+            table.insert(row, 1, i)
+            w = string.len(row[2])
         end
 
-        if w > best_displayname_width then
-            best_displayname_width = w
+        -- Updating maximum
+        if w > best_name_width then
+            best_name_width = w
         end
     end
 
+    -- Beginning to print the results of the search
     if display_details then
         local detailed_rows = {}
-        for _, row in ipairs(display_list) do
-            table.insert(detailed_rows, {
-                row[1], 
-                row[2][1], 
-                row[2][2],
-                row[2][3],
-                row[2][4],
-                row[2][5],
-                row[2][6],
-            })
+
+        -- Extract lines from the groups returned by search_database_for_item
+        for _,group in ipairs(display_list) do
+            for _,line in ipairs(group) do
+                table.insert(detailed_rows, line)
+            end
         end
 
-        -- Setting the columns names and the white space.
+        -- Print detailed display
         utils.paged_tabulate_fixed(
             detailed_rows,
-            {"<#>","<Storage>", "@", "<s>", "<Name>", "x", "<Qty>"}, 
-            {"","","","","","",""},
-            {3,11,1,3,best_displayname_width,1,5},
-            {false,false,true,false,false,true,false,false}
+            {"<#>","<Storage>", "@", "<s>", "<ID>", "x", "<Qty>", "<Nbt>"}, 
+            {3,11,1,3,best_name_width,1,5,20},
+            {false,true,false,false,false,false,false,false,}
         )
     else
+        -- Print simple display
         utils.paged_tabulate_fixed(
             display_list, 
-            {"<#>", "<Qty>", "x", "<Name>", "<NBT?>"}, 
-            {"", "", "", "", ""},
-            {4,5,1,best_displayname_width,6},
-            {false,true,false,false}
+            {"<#>", "<Name>", "x", "<Qty>"}, 
+            {4,best_name_width,1,6},
+            {false,false,false}
         )
     end
 else

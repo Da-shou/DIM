@@ -72,16 +72,19 @@ for i,name in ipairs(inv_names) do
         slot_count = slot_count + 1
     end
 
+    -- Parse the current inventory
     local current_slot_index = 0
     local emptyInv = true
     for slot, _ in pairs(inventory.list()) do
         emptyInv = false
         local details = inventory.getItemDetail(slot)
         
+        -- Adding the items to the storage object.
         if details and details.name then
             utils.add_stack_to_db(storage,details.name,slot,name,details)
         end
 
+        -- Progress calculations
         inventory_progress = ((current_slot_index)/slot_count-1)/table.getn(inv_names)
         total_progress = ((inventory_progress) + (i / inventories_count))*100
 
@@ -96,6 +99,7 @@ for i,name in ipairs(inv_names) do
         loading_index = loading_index + 1
     end
 
+    -- Update the loading if the inventory was empty
     if emptyInv then
         inventory_progress = 1/inventories_count
         total_progress = ((inventory_progress) + (i / inventories_count))*100
