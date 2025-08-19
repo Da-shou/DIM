@@ -96,7 +96,7 @@ function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
             
             -- Getting the space left in the stack
             local space_left = max_stack_size - stack.count
-            utils.log(("Found a partially filled slot (%d) in %s for %d x %s"):format(slot, inv_name, quantity, item_name), INFO)
+            utils.log(("Found a partially filled slot (%d) in %s for %d x %s"):format(slot, inv_name, quantity, item_name), DEBUG)
             -- Information for pushItems so it pushes the correct amount of 
             -- items into the stack.
             return slot, space_left
@@ -113,7 +113,7 @@ function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
     -- were found in inventory.
     for slot = 1, size do
         if items[slot] == nil then
-            utils.log(("Found an empty slot (%d) in %s for %d x %s"):format(slot, inv_name, quantity, item_name), INFO)
+            utils.log(("Found an empty slot (%d) in %s for %d x %s"):format(slot, inv_name, quantity, item_name), DEBUG)
             return slot
         end
     end
@@ -264,18 +264,15 @@ for input_slot, input_stack in pairs(input_stacks) do
     end
 
     local x,y = term.getCursorPos()
-    
     -- Check if inventory is empty after storing an item from input.
     -- If true, all items have been stored.
     if is_input_empty() then
         incomplete_storing = false
-        term.setCursorPos(1, y_max-1)
         term.clearLine()
         utils.log(("%.1f%% done."):format(100.0), INFO)
         term.setCursorPos(x,y)
     else
         progress = (input_stack_index/input_inventory_stack_count)*100
-        term.setCursorPos(1, y_max-1)
         term.clearLine()
         utils.log(("%.1f%% done."):format(progress), INFO)
         term.setCursorPos(x,y)

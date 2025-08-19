@@ -12,6 +12,8 @@ local ERROR = config.LOGTYPE_ERROR
 
 local utils = {}
 
+local PAGED_TABULATE_MESSAGE = "Press any key for next page of results..."
+
 -- Clears terminal and sets cursor pos to 1,1
 function utils.reset_terminal()
     term.clear()
@@ -29,11 +31,11 @@ end
 function utils.log(content, type)
     for _, allowed_type in ipairs(config.displayed_logtypes) do        
         if type == config.LOGTYPE_ERROR then
-            printError(("C%d@%s %s> %s"):
+            printError(("C%d@%s <%s> : %s"):
                 format(os.getComputerID(),utils.get_local_time(),type,content))
             break
-        elseif type == allowed_type then
-            print(("C%d@%s %s> %s"):
+        elseif type == allowed_type then    
+            print(("C%d@%s <%s> %s"):
                 format(os.getComputerID(),utils.get_local_time(),type,content))
             break
         end
@@ -139,5 +141,63 @@ function utils.write_json_string_in_file(path, object)
 
     return true
 end
+
+-- Allows for a paged tabulated print of a table because the one
+-- that ships with ComputerCraft does not work ?
+function utils.paged_tabulate(data, headers, spacing)
+    local _, h = term.getSize()
+
+    -- Space for the headers + spacing + rows.
+    local h_space = h-5
+
+    -- Space for rows only.
+    local h_space_rows = h_space-2
+
+    local current_page_rows = {}
+
+    -- Calculate number of pages needed
+    local nb_page_needed = math.ceil(table.getn(data)/h_space)
+    local count = 0
+
+    for current_page = 1, nb_page_needed do
+        -- Clears
+        utils.reset_terminal()
+        current_page_rows = {}
+
+        -- Fill current page array with rows
+        for i=1,h_space do
+            local k = count + i
+            if k <= table.getn(data) then
+                table.insert(current_page_rows, data[k])
+                if table.getn(current_page_rows) == h_space_rows then break end
+            end
+        end
+
+        -- Add column names and spacing at start
+        table.insert(current_page_rows, 1, spacing)
+        table.insert(current_page_rows, 1, headers)
+
+        -- Update the row counter
+        count = count + h_space_rows
+
+        -- Display the paged results
+        textutils.tabulate(table.unpack(current_page_rows))
+
+        print()
+        utils.log(("%d results shown - Page %d/%d"):format(
+            table.getn(current_page_rows),
+            current_page, 
+            nb_page_needed), 
+            config.LOGTYPE_INFO)
+
+        -- If this was the last page, leave
+        if (current_page == nb_page_needed) then return end
+
+        -- Prompt the user to hit a key before showing next page.
+        utils.log(("%s"):format(PAGED_TABULATE_MESSAGE), config.LOGTYPE_INFO)
+        os.pullEvent("key")
+    end
+end
+
 
 return utils

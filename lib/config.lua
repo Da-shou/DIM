@@ -35,6 +35,8 @@ config.INPUT_STORAGE_NAME = "minecraft:barrel_204"
 -- A higher value means less loading updates ; less screen clutter.
 config.LOADING_MODULO = 1
 
+config.MAX_DISPLAY_NAME_STRING_LENGTH = 25
+
 -- Logging types to sort the different messages to the user.
 config.LOGTYPE_DEBUG = "DEBUG"
 config.LOGTYPE_ERROR = "ERROR"
@@ -53,7 +55,7 @@ config.displayed_logtypes = {
     config.LOGTYPE_INFO,
     config.LOGTYPE_ERROR,
     config.LOGTYPE_WARNING,
-    config.LOGTYPE_DEBUG,
+    --config.LOGTYPE_DEBUG,
 }
 
 return config
