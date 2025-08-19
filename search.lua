@@ -14,7 +14,7 @@ local utils = require("lib/utils")
 
 local INFO = config.LOGTYPE_INFO
 local BEGIN = config.LOGTYPE_BEGIN
-local DEBUG = config.LOGTYPE_BEGIN
+local DEBUG = config.LOGTYPE_DEBUG
 local END = config.LOGTYPE_END
 local WARN = config.LOGTYPE_WARNING
 local ERROR = config.LOGTYPE_ERROR
@@ -23,6 +23,7 @@ utils.reset_terminal()
 
 -- Getting the search query
 local search_query = arg[1]
+local search_all = false
 
 -- Display the list of where items are
 local display_details = false
@@ -34,6 +35,8 @@ if arg[1] == nil or arg[1] == "" then
     utils.log(usage, INFO)
     return
 end
+
+if search_query == "*" then search_all = true end
 
 if arg[2] == nil and arg[2] ~= "false" then
     utils.log("display_details parameter wasn't found. Defaulting to false.", WARN)
@@ -50,10 +53,14 @@ local itemreg = utils.prepare_registries()
 
 local candidates = {}
 
-for _,id in ipairs(itemreg) do  
-    if string.find(string.lower(id), string.lower(search_query), 1, true) then
-        table.insert(candidates, id)
+if not search_all then
+    for _,id in ipairs(itemreg) do  
+        if string.find(string.lower(id), string.lower(search_query), 1, true) then
+            table.insert(candidates, id)
+        end
     end
+else
+    candidates = itemreg
 end
 
 -- Opening and unserializing the database for search and storing
@@ -82,7 +89,7 @@ end
 
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
-    local best_name_width = 0
+    local best = 0
 
     -- Inserting id and finding optimal width size for name column.
     for i, row in ipairs(display_list) do
@@ -101,10 +108,12 @@ if table.getn(display_list) > 0 then
         end
 
         -- Updating maximum
-        if w > best_name_width then
-            best_name_width = w
+        if w > best then
+            best = w
         end
     end
+
+    if best > config.MAX_DISPLAY_NAME_LENGTH then best = config.MAX_DISPLAY_NAME_LENGTH end
 
     -- Beginning to print the results of the search
     if display_details then
@@ -121,7 +130,7 @@ if table.getn(display_list) > 0 then
         utils.paged_tabulate_fixed(
             detailed_rows,
             {"<#>","<Storage>", "@", "<s>", "<ID>", "x", "<Qty>", "<Nbt>"}, 
-            {3,11,1,3,best_name_width,1,5,20},
+            {3,11,1,3,best,1,5,20},
             {false,true,false,false,false,false,false,false,}
         )
     else
@@ -129,7 +138,7 @@ if table.getn(display_list) > 0 then
         utils.paged_tabulate_fixed(
             display_list, 
             {"<#>", "<Name>", "x", "<Qty>"}, 
-            {4,best_name_width,1,6},
+            {4,best,1,6},
             {false,false,false}
         )
     end

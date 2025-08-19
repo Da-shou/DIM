@@ -204,8 +204,9 @@ function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
     local current_page_rows = {}
 
     -- Calculate number of pages needed
-    local nb_page_needed = math.ceil(table.getn(data)/h_space)
     local count = 0
+
+    local nb_page_needed = math.ceil(table.getn(data)/h_space_rows)
 
     for current_page = 1, nb_page_needed do
         -- Clears
