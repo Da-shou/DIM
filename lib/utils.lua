@@ -9,10 +9,17 @@
 local config = require("lib/config")
 
 local ERROR = config.LOGTYPE_ERROR
+local INFO = config.LOGTYPE_INFO
+local DEBUG = config.LOGTYPE_DEBUG
 
 local utils = {}
 
 local PAGED_TABULATE_MESSAGE = "Press any key for next page of results..."
+
+-- Ternary operator implementation (Thanks Lua)
+function utils.fif(condition, if_true, if_false)
+  if condition then return if_true else return if_false end
+end
 
 -- Clears terminal and sets cursor pos to 1,1
 function utils.reset_terminal()
@@ -23,6 +30,7 @@ end
 -- Return a string containing the local time from 
 -- the computer running the game in a 12-hour format.
 function utils.get_local_time()
+---@diagnostic disable-next-line: param-type-mismatch, redundant-parameter
     return textutils.formatTime(os.time("local", false))
 end
 
@@ -30,13 +38,14 @@ end
 -- content[string] : content to show on screen
 -- type[config.displayed_logtypes] : logtype to show on screen, before log.
 function utils.log(content, type)
+    local log_pattern = "C%d@%s <%s> %s"
     for _, allowed_type in ipairs(config.displayed_logtypes) do        
         if type == config.LOGTYPE_ERROR then
-            printError(("C%d@%s <%s> : %s"):
+            printError(log_pattern:
                 format(os.getComputerID(),utils.get_local_time(),type,content))
             break
         elseif type == allowed_type then    
-            print(("C%d@%s <%s> %s"):
+            print(log_pattern:
                 format(os.getComputerID(),utils.get_local_time(),type,content))
             break
         end
@@ -66,6 +75,8 @@ function utils.check_db_size(size)
     else
         formatted_size = ("%.1f"):format(size/unit_div)..unit_char.."B"
     end
+
+    utils.log(("New item storage database size is %s"):format(formatted_size), INFO)
 
     return formatted_size, size >= fs.getFreeSpace(config.BASE_PATH)
 end
@@ -107,29 +118,29 @@ function utils.close_file(file_handle)
 end
 
 -- Safely gets content of JSON file as lua object.
--- Returns false if an error occured.
--- Return true otherwise.
+-- Returns nil if an error occured.
+-- Return object otherwise.
 -- path[string] : path to the JSON file.
 function utils.get_json_file_as_object(path)
     local file = utils.open_file(path, "r")
-    if not file then return false end
+    if not file then return nil end
 
     local file_content = file.readAll()
 
     if not file_content then
         utils.log("An error occured during the reading of the file.", ERROR)
-        return false
+        return nil
     end
 
     local JSON, e = textutils.unserializeJSON(file_content)
     if not JSON then
         utils.log("The file could not unserialized from JSON. Reason will be printed below.", ERROR)
         utils.log(("%s"):format(e), ERROR)
-        return false
+        return nil
     end
 
     local did_close = utils.close_file(file)
-    if not did_close then return false end
+    if not did_close then return nil end
 
     return JSON
 end
@@ -271,6 +282,7 @@ function utils.prepare_registries()
     local registry = {}
     for _,path in ipairs(config.REG_PATHS) do
         local reg = utils.get_json_file_as_object(path)
+        if not reg then return registry end
         for _,s in ipairs(reg) do
             table.insert(registry, s)
         end
@@ -304,18 +316,16 @@ function utils.search_database_for_item(database, name, detailed_output, nbt)
                 total = total + stack.details.count
                 
                 if detailed_output then
-                    -- Removing the first part of the id to only get the name and
-                    -- id of storage.
-                    local source = stack.source:match(":(.*)") or stack.source
 
                     table.insert(detailed_results,{
-                        source,
+                        stack.source,
                         "@",
                         stack.slot,
                         name,
                         "x",
                         stack.details.count,
-                        nbt
+                        nbt,
+                        stack.details.maxCount
                     })
                 end
             end
@@ -329,6 +339,23 @@ function utils.search_database_for_item(database, name, detailed_output, nbt)
     end
 end
 
+-- Sorts a table from the database results in descending order.
+-- results[table]       : the results table to sort
+-- field_nb[number]     : the index of the field to sort with.
+-- ascending[boolean]   : (optional) if false, sorts in descending order. defaults to true.
+function utils.sort_results_from_db_search(results, field_nb, ascending)
+    if ascending == nil then ascending = true end
+    table.sort(results, 
+        function(a,b) 
+            return utils.fif(
+                (ascending), 
+                (a[field_nb] < b[field_nb]), 
+                (a[field_nb] > b[field_nb])
+            )
+        end
+    )
+end
+
 -- Adds a stack of items to the JSON database. Is used when a new empty slot is
 -- filled with items.
 --
@@ -340,27 +367,97 @@ end
 function utils.add_stack_to_db(database, section, slot, inv_name, details)
     if not database then return end
 
-    local section_name = section
-
     -- Checking if item has a section, if not, create it with
     -- both the stacks and nbt groups.
-    if not database[section_name] then
-        database[section_name] = {}
-        database[section_name]["stacks"] = {}
-        database[section_name]["nbt"] = {}
+    if not database[section] then
+        database[section] = {}
+        database[section]["stacks"] = {}
+        database[section]["nbt"] = {}
     end
 
     -- Insert the NBT of the current object to the nbt table.
     if details.nbt then
-        table.insert(database[section_name]["nbt"], details.nbt)
+        table.insert(database[section]["nbt"], details.nbt)
     end
 
     -- Insert the information about the current stack to the stack table.
-    table.insert(database[section_name]["stacks"],{
+    table.insert(database[section]["stacks"],{
             slot = slot,
             source = inv_name,
             ["details"] = details
     })
+end
+
+-- Removes a stack of items to the JSON database. Used when extracting an
+-- entire stack of items.
+--
+-- database[Object]     : Lua object taken from the JSON file.
+-- section[string]      : Name (ID) of the item being added.
+-- slot[number]         : Slot of the storage where the stack is stored in-game.
+-- inv_name[string]     : Name of the inventory where the stack is stored.
+-- details[Object]      : Object containing item details from getItemDetail
+function utils.remove_stack_from_db(database, section, slot, source)
+    if not database then return end
+    if not database[section] then return end
+
+    for i,stack in ipairs(database[section]["stacks"]) do
+        if stack.slot == slot and stack.source == source then
+            utils.log(("Removed a stack from %s at slot %s from JSON Database."):format(
+                stack.source, stack.slot
+            ), DEBUG)
+            table.remove(database[section]["stacks"], i)
+        end
+    end
+end
+
+-- Updates a stack of items to the JSON database. Used when extracting a
+-- certain number of items from a stack.
+--
+-- database[Object]     : Lua object taken from the JSON file.
+-- section[string]      : Name (ID) of the item being added.
+-- slot[number]         : Slot of the storage where the stack is stored in-game.
+-- inv_name[string]     : Name of the inventory where the stack is stored.
+-- details[Object]      : Object containing item details from getItemDetail
+function utils.update_stack_count_in_db(database, section, slot, source, new_count)
+    if not database then return end
+    if not database[section] then return end
+
+    for i,stack in ipairs(database[section]["stacks"]) do
+
+        if stack.slot == slot and stack.source == source then
+            utils.log(("Updated a stack from %s at slot %s from JSON Database."):format(
+                stack.source, stack.slot
+            ), DEBUG)
+
+            utils.log(("%d => %d"):format(
+                stack.details.count, new_count
+            ), DEBUG)
+
+
+            database[section]["stacks"][i]["details"].count = new_count
+        end
+    end
+end
+
+function utils.save_database_to_JSON(database)
+    -- Serializing our new db to JSON
+    local UPDATED_JSON_DB = textutils.serializeJSON(database)
+    local db_size = string.len(UPDATED_JSON_DB)
+
+    if not utils.check_db_size(db_size) then
+        utils.log("Not enough free space on disk left to save new database. Exiting...", ERROR)
+        return false
+    end
+
+    -- Overwring the old db if enough space is found
+    utils.log("Overwriting old JSON database...", DEBUG)
+
+    if not utils.write_json_string_in_file(config.DATABASE_FILE_PATH, UPDATED_JSON_DB) then
+        return false
+    end
+
+    utils.log("Successfully updated JSON database", DEBUG)
+    return true
 end
 
 return utils

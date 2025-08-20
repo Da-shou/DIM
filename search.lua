@@ -87,10 +87,6 @@ for _,c in ipairs(candidates) do
     end
 end
 
-local function sort_results(t, field)
-    table.sort(t, function(a,b) return a[field] > b[field] end)
-end
-
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
     local best = 0
@@ -124,6 +120,10 @@ if table.getn(display_list) > 0 then
         -- Extract lines from the groups returned by search_database_for_item
         for i,group in ipairs(display_list) do
             for j,line in ipairs(group) do
+                -- Removing the first part of the id to only get the name and
+                -- id of storage.
+                line[1] = line[1]:match(":(.*)") or line[1]
+
                 table.insert(line, 1, i)
                 table.insert(detailed_rows, line)
             end
@@ -139,7 +139,7 @@ if table.getn(display_list) > 0 then
     else
         -- Sort results by quantity if search all
         if search_all then 
-            sort_results(display_list, 3)
+            utils.sort_results_from_db_search(display_list, 3, false)
         end
 
         for i,row in ipairs(display_list) do

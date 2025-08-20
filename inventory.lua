@@ -51,7 +51,7 @@ local inv_names, inv_count = get_inventories()
 
 -- Creating the lua object that will hold all of our
 -- item data which will then be serialized to JSON.
-local storage = {}
+local database = {}
 
 utils.log(("Now indexing storage with %d inventories...")
     :format(inv_count), INFO)
@@ -84,7 +84,7 @@ for i,name in ipairs(inv_names) do
         
         -- Adding the items to the storage object.
         if details and details.name then
-            utils.add_stack_to_db(storage,details.name,slot,name,details)
+            utils.add_stack_to_db(database,details.name,slot,name,details)
         end
 
         -- Progress calculations
@@ -117,27 +117,16 @@ term.setCursorPos(x,y)
 utils.log(("100% done."), INFO)
 utils.log("Indexing complete !", INFO)
 
--- Serializing our lua object to JSON
-local JSON_DATABASE = textutils.serializeJSON(storage)
-local JSON_NAMES = textutils.serializeJSON(inv_names)
+local db_did_save = utils.save_database_to_JSON(database)
 
--- The size of the database is the length of the string (duh)
-local storage_size = string.len(JSON_DATABASE)
-local names_size = string.len(JSON_NAMES)
-local db_size = storage_size + names_size
-
-local formatted_db_size = utils.check_db_size(db_size)
-
--- Returning if there isn't enough space on the disk.
-if not formatted_db_size then
-    utils.log("Not enough free space on disk left to save new database. Exiting...", ERROR)
+-- Checking if saving went smoothly
+if not db_did_save then
+    utils.log("Something bad happened during database writing. See above for more info.", ERROR)
     return
 end
 
-utils.log(("New item storage database size is %s"):format(formatted_db_size), INFO)
-
--- Writing the database to the JSON file.
-utils.write_json_string_in_file(config.DATABASE_FILE_PATH, JSON_DATABASE)
+-- Writing the iventories name file.
+local JSON_NAMES = textutils.serializeJSON(inv_names)
 
 -- Writing the inventory names to a JSON file for future use by other
 -- programs.

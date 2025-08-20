@@ -33,7 +33,18 @@ local input = peripheral.wrap(IN)
 local input_stacks = input.list()
 
 local inv_names = utils.get_json_file_as_object(config.INVENTORIES_FILE_PATH)
+if not inv_names then
+    utils.log([[No inventories were found in the inventories list. 
+    Verify that your inventories are connected to the network and that the inventory program was run
+    afterwards.]], ERROR)
+    return
+end
+
 local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+if not inv_names then
+    utils.log("No database cache was found. Please run inventory program.", ERROR)
+    return
+end
 
 -- Checks if input inventory is empty.
 function is_input_empty()
@@ -94,9 +105,11 @@ function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
             
             -- Getting the space left in the stack
             local space_left = max_stack_size - stack.count
-            utils.log(("Found a partially filled slot (%d) in %s for %d x %s"):format(slot, inv_name, quantity, item_name), DEBUG)
+
+            utils.log(("Found a partially filled (%d items) slot (%d) in %s for %d x %s"):format(stack.count, slot, inv_name, quantity, item_name), DEBUG)
             -- Information for pushItems so it pushes the correct amount of 
             -- items into the stack.
+
             return slot, space_left
         end
         -- To be able to continue in the loop. 
@@ -202,14 +215,14 @@ for input_slot, input_stack in pairs(input_stacks) do
                 if not db then return end
 
                 utils.log(("Inserted %d x %s in %s in slot %d"):format(inserted_count, input_stack.name, output_name, output_slot), DEBUG)                
-                
                 local section = db[stack_details.name]
                 -- If we know a partial stack was modified
                 if partial_insert and section then
                     utils.log("Updating existing stack in JSON database", DEBUG)
                     -- Find the object that represents 
                     -- the stack to update its count
-                    for _, triple in ipairs(section) do
+                    for _, triple in ipairs(section["stacks"]) do
+                        textutils.tabulate(table.unpack(triple))
                         local db_details = triple["details"]
                         local db_slot = triple["slot"]
                         local db_source = triple["source"]
@@ -217,7 +230,13 @@ for input_slot, input_stack in pairs(input_stacks) do
                         if output_slot == db_slot and output_name == db_source then
                             utils.log("Found correct stack in JSON file", DEBUG)
                             local db_count = db_details["count"]
-                            db_details["count"] = db_count + inserted_count
+                            utils.log(("%d => %d + %d"):format(db_count, db_count, inserted_count), DEBUG)
+                            
+                            if (db_count + inserted_count <= db_details["maxCount"]) then
+                                db_details["count"] = db_count + inserted_count
+                            else
+                                utils.log("Tried to add too many items to a stack.", ERROR)
+                            end
                         end
                     end
                 else
@@ -283,22 +302,12 @@ else
 end
 
 -- Serializing our new db to JSON
-local UPDATED_JSON_DB = textutils.serializeJSON(db)
-local db_size = string.len(UPDATED_JSON_DB)
+local db_did_save = utils.save_database_to_JSON(db)
 
-if not utils.check_db_size(db_size) then
-    utils.log("Not enough free space on disk left to save new database. Exiting...", ERROR)
+if not db_did_save then
+    utils.log("Something bad happened during database writing. See above for more info.", ERROR)
     return
 end
-
--- Overwring the old db if enough space is found
-utils.log("Overwriting old JSON database...", DEBUG)
-
-if not utils.write_json_string_in_file(config.DATABASE_FILE_PATH, UPDATED_JSON_DB) then
-    return
-end
-
-utils.log("Successfully updated JSON database", DEBUG)
 
 -- End the program
 utils.log("Insertion ended successfully.", END)
