@@ -402,7 +402,7 @@ function utils.remove_stack_from_db(database, section, slot, source)
 
     for i,stack in ipairs(database[section]["stacks"]) do
         if stack.slot == slot and stack.source == source then
-            utils.log(("Removed a stack from %s at slot %s from JSON Database."):format(
+            utils.log(("Removed stack from %s at slot %s from database."):format(
                 stack.source, stack.slot
             ), DEBUG)
             table.remove(database[section]["stacks"], i)
@@ -423,19 +423,15 @@ function utils.update_stack_count_in_db(database, section, slot, source, new_cou
     if not database[section] then return end
 
     for i,stack in ipairs(database[section]["stacks"]) do
-
         if stack.slot == slot and stack.source == source then
-            utils.log(("Updated a stack from %s at slot %s from JSON Database."):format(
-                stack.source, stack.slot
+            utils.log(("Stack updated (%d => %d) from %s at slot %s."):format(
+                stack.details.count, new_count, stack.source, stack.slot
             ), DEBUG)
-
-            utils.log(("%d => %d"):format(
-                stack.details.count, new_count
-            ), DEBUG)
-
 
             database[section]["stacks"][i]["details"].count = new_count
         end
+
+        ::next_stack::
     end
 end
 

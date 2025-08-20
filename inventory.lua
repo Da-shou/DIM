@@ -114,7 +114,7 @@ end
 
 term.clearLine()
 term.setCursorPos(x,y)
-utils.log(("100% done."), INFO)
+utils.log(("100.0% done."), INFO)
 utils.log("Indexing complete !", INFO)
 
 local db_did_save = utils.save_database_to_JSON(database)

@@ -74,7 +74,7 @@ local display_list = {}
 -- Iterate over every possible item type that matches the search
 for _,c in ipairs(candidates) do
     local section = database[c]
-    if section then
+    if section and table.getn(section["stacks"]) > 0 then
         local section_nbt = section["nbt"]
         if section_nbt and table.getn(section_nbt) > 0 then
             for _,nbt in ipairs(section_nbt) do

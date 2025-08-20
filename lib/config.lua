@@ -65,7 +65,7 @@ config.displayed_logtypes = {
     config.LOGTYPE_INFO,
     config.LOGTYPE_ERROR,
     config.LOGTYPE_WARNING,
-    config.LOGTYPE_DEBUG,
+    --config.LOGTYPE_DEBUG,
 }
 
 return config
