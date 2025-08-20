@@ -21,6 +21,8 @@ local BEGIN = config.LOGTYPE_BEGIN
 local INFO = config.LOGTYPE_INFO
 local END = config.LOGTYPE_END
 
+math.randomseed(os.time())
+
 utils.reset_terminal()
 
 -- Program startup
@@ -39,6 +41,8 @@ if not inv_names then
     afterwards.]], ERROR)
     return
 end
+
+utils.shuffle_list(inv_names)
 
 local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
 if not inv_names then
@@ -161,6 +165,7 @@ for input_slot, input_stack in pairs(input_stacks) do
     -- Checking if the slot is empty
     if input_stacks[input_slot] ~= nil then
         -- Iterating over all of the storage inventories
+        
         for _, output_name in ipairs(inv_names) do
             utils.log(("Checking %s..."):format(output_name), DEBUG)
             

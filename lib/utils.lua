@@ -61,19 +61,19 @@ function utils.check_db_size(size)
     local unit_div = 1
 
     -- Picking an adequate size for the size printing.
-    if size >= 1000000 then
+    if size >= 1000*1000 then
         unit_char = "M"
-        unit_div = 1048576
+        unit_div = 100000
     elseif size >= 1000 then
-        unit_char = "k"
-        unit_div = 1024
+        unit_char = "K"
+        unit_div = 100
     end
 
     local formatted_size = nil
     if unit_div == 1 then
-        formatted_size = ("%d"):format(size/unit_div)..unit_char.."B"
+        formatted_size = ("%d"):format((size/unit_div)/10)..unit_char.."B"
     else
-        formatted_size = ("%.1f"):format(size/unit_div)..unit_char.."B"
+        formatted_size = ("%.1f"):format((size/unit_div)/10)..unit_char.."B"
     end
 
     utils.log(("New item storage database size is %s"):format(formatted_size), INFO)
@@ -167,14 +167,14 @@ end
 -- text[string]         : string to be padded.
 -- width[string]        : how many spaces of padding.
 -- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
-local function padCell(text, width, rightAlign)
+local function padCell(text, width, right_align)
     local text_len = string.len(text)
     if text_len > width then
         -- truncate if too long
         text = text:sub(1, width)
     end
 
-    if rightAlign then
+    if right_align then
         return string.rep(" ", width - text_len)..text
     else
         return text..string.rep(" ", width - text_len)
@@ -182,15 +182,18 @@ local function padCell(text, width, rightAlign)
 end
 
 -- Custom tabulate function allowing for custom widths of colums.
--- rows[{{s1,s2},{s3,s4},...}] : table of strings to be printed.
--- widths[{number,...}]        : width for each column
--- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
-local function tabulate_fixed(rows, widths, rightAlign)
+-- rows[{{s1,s2},{s3,s4},...}]  : table of strings to be printed.
+-- widths[{number,...}]         : width for each column
+-- rightAlign[boolean]          : if true, adds spaces to the right. Defaults to false.
+-- left_space[number]           : space to add to the left of each row, defaults to 0
+local function tabulate_fixed(rows, widths, right_align, left_space)
+    if not left_space then left_space = 0 end
     for _, row in ipairs(rows) do
         local out = {}
+        table.insert(out, string.rep(" ", left_space))
         for i, cell in ipairs(row) do
             local w = widths[i] or 8  -- default width
-            local r = rightAlign and rightAlign[i] or false
+            local r = right_align and right_align[i] or false
             table.insert(out, padCell(cell, w, r))
         end
         print(table.concat(out, " ")) -- space between cols
@@ -203,7 +206,7 @@ end
 -- headers[{string,...}]       : Names of the headers of each columns.
 -- widths[{number,...}]        : width for each column
 -- rightAlign[boolean]  : if true, adds spaces to the right. Defaults to false.
-function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
+function utils.paged_tabulate_fixed(data, headers, widths, right_align, left_space)
     local w, h = term.getSize()
 
     utils.reset_terminal()
@@ -250,7 +253,7 @@ function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
         count = count + h_space_rows
 
         -- Display the paged results
-        tabulate_fixed(current_page_rows, widths, rightAlign)
+        tabulate_fixed(current_page_rows, widths, right_align, left_space)
 
         print()
         utils.log(("%d results shown - Page %d/%d"):format(
@@ -271,6 +274,148 @@ function utils.paged_tabulate_fixed(data, headers, widths, rightAlign)
         -- Prompt the user to hit a key before showing next page.
         utils.log(("%s"):format(PAGED_TABULATE_MESSAGE), config.LOGTYPE_INFO)
         os.pullEvent("key")
+
+        utils.reset_terminal()
+    end
+end
+
+-- Basically the same function as above but allows the user to return a
+-- choice using the arrow keys and enter. Going below last results 
+-- with the arrows makes the next page show, same with going above first.
+function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, left_space)
+    local w, h = term.getSize()
+
+    utils.reset_terminal()
+
+    -- Where the cursor will begin
+    local cursor_char = "->"
+    local cursor_pos = 1
+
+    -- Add the cursor column
+    for i,row in ipairs(data) do
+        table.insert(row,1,utils.fif(i==1, cursor_char,""))
+    end
+
+    table.insert(headers, 1, "<Crsr>")
+    table.insert(right_align, 1, true)
+    table.insert(widths, 1, 6)
+
+    -- Space for the headers + spacing + rows.
+    local h_space = h-5
+
+    -- Space for rows only.
+    local h_space_rows = h_space-2
+    local current_page_rows = {}
+
+    -- Calculate number of pages needed
+    local start_id = 0
+    local nb_page_needed = math.ceil(table.getn(data)/h_space_rows)
+
+    local key = nil
+
+    local current_page = 1
+
+    -- Start input loop
+    while true do
+        -- Clears
+        current_page_rows = {}
+
+        if key then
+            local pressed_key_name = keys.getName(key)
+            -- Updating cursor position based on input
+            if pressed_key_name == "down" then
+                cursor_pos = cursor_pos + 1
+            elseif pressed_key_name == "up" then 
+                cursor_pos = cursor_pos - 1
+            -- Confirmation of choice
+            elseif pressed_key_name == "enter" then
+                -- Removing the cursor column
+                for _,row in ipairs(data) do
+                    table.remove(row,1)
+                end
+                -- Returns the data on the line of the cursor.
+                return data[cursor_pos]
+            end
+        end
+
+        local y_limit = math.min(table.getn(data), h_space_rows)
+
+        -- Changing page if we hit bottom or top.
+        if cursor_pos > y_limit then
+            -- Going to next page
+            if current_page == nb_page_needed then
+                -- If last page, go to first page.
+                current_page = 1
+            elseif current_page < nb_page_needed then
+                -- If not page, go to next page.
+                current_page = current_page + 1
+            end
+            cursor_pos = 1
+        elseif cursor_pos < 1 then
+            -- Going to previous page
+            if current_page == 1 then
+                -- If first page, go to last page.
+                current_page = nb_page_needed
+            elseif current_page > 1 then
+                -- If not, go to previous
+                current_page = current_page - 1
+            end
+            cursor_pos = y_limit
+        end
+
+        start_id = h_space_rows*(current_page-1)
+
+        -- Fill current page array with rows
+        for i=1,h_space do
+            local k = start_id + i
+            if k <= table.getn(data) then
+                table.insert(current_page_rows, data[k])
+
+                if k == cursor_pos then
+                    data[k][1] = cursor_char
+                else
+                    data[k][1] = ""
+                end
+
+                if table.getn(current_page_rows) == h_space_rows then break end
+            end
+        end
+
+        local spacing = {}
+        
+        for _=1, table.getn(headers) do
+            table.insert(spacing,string.rep("-",w))
+        end
+
+        -- Add column names and spacing at start
+        table.insert(current_page_rows, 1, spacing)
+        table.insert(current_page_rows, 1, headers)
+
+        -- Prompt the user to hit a key before showing next page.
+        utils.log(("%s"):format("Choose with <UP> and <DOWN>."), config.LOGTYPE_INFO)
+        utils.log(("%s"):format("Confirm your choice with <ENTER>."), config.LOGTYPE_INFO)
+
+        print()
+
+        -- Display the paged results
+        tabulate_fixed(current_page_rows, widths, right_align, left_space)
+
+        print()
+
+        utils.log(("%d results shown - Page %d/%d"):format(
+            table.getn(current_page_rows) - 2,
+            current_page, 
+            nb_page_needed), 
+            config.LOGTYPE_INFO
+        )
+
+        -- If this was the last page, leave
+        if (current_page == nb_page_needed) then 
+            -- Prompt the user to hit a key before showing next page.
+            utils.log(("End of list reached."), config.LOGTYPE_INFO)
+        end
+
+        _, key, _ = os.pullEvent("key")
 
         utils.reset_terminal()
     end
@@ -304,19 +449,22 @@ end
 function utils.search_database_for_item(database, name, detailed_output, nbt)
     local detailed_results = {}
     local item_type = database[name]
+    local display_name = ""
 
     if item_type then
         local item_type_stacks = item_type["stacks"]
         local total = 0
-        local display_name = nil
+        local stack_max_size = 1
 
+        -- If nbt == nil, will insert all stacks without NBTs.
+        -- If nbt has a value, will insert all stacks with hash = nbt
         for _,stack in ipairs(item_type_stacks) do
-            if not nbt or stack.details.nbt == nbt then
+            if stack.details.nbt == nbt then
                 display_name = stack.details.displayName
                 total = total + stack.details.count
+                stack_max_size = stack.details.maxCount
                 
                 if detailed_output then
-
                     table.insert(detailed_results,{
                         stack.source,
                         "@",
@@ -324,15 +472,16 @@ function utils.search_database_for_item(database, name, detailed_output, nbt)
                         name,
                         "x",
                         stack.details.count,
-                        nbt,
-                        stack.details.maxCount
+                        stack.details.nbt,
+                        stack.details.maxCount,
+                        stack.details.displayName
                     })
                 end
             end
         end
 
         if not detailed_output then
-            return {display_name, "x", total}
+            return {display_name, "x", total, stack_max_size}
         else
             return detailed_results
         end
@@ -356,6 +505,14 @@ function utils.sort_results_from_db_search(results, field_nb, ascending)
     )
 end
 
+function utils.shuffle_list(list)
+    for i = table.getn(list), 2, -1 do
+    local j = math.random(i) -- pick random index from 1..i
+    list[i], list[j] = list[j], list[i] -- swap
+    end
+    return list
+end
+
 -- Adds a stack of items to the JSON database. Is used when a new empty slot is
 -- filled with items.
 --
@@ -377,7 +534,13 @@ function utils.add_stack_to_db(database, section, slot, inv_name, details)
 
     -- Insert the NBT of the current object to the nbt table.
     if details.nbt then
+        for _,nbt in ipairs(database[section]["nbt"]) do
+            if nbt == details.nbt then 
+                goto nbt_end
+            end
+        end
         table.insert(database[section]["nbt"], details.nbt)
+        ::nbt_end::
     end
 
     -- Insert the information about the current stack to the stack table.
@@ -396,9 +559,11 @@ end
 -- slot[number]         : Slot of the storage where the stack is stored in-game.
 -- inv_name[string]     : Name of the inventory where the stack is stored.
 -- details[Object]      : Object containing item details from getItemDetail
-function utils.remove_stack_from_db(database, section, slot, source)
+function utils.remove_stack_from_db(database, section, slot, source, nbt)
     if not database then return end
     if not database[section] then return end
+
+    local remove_nbt = true
 
     for i,stack in ipairs(database[section]["stacks"]) do
         if stack.slot == slot and stack.source == source then
@@ -406,6 +571,18 @@ function utils.remove_stack_from_db(database, section, slot, source)
                 stack.source, stack.slot
             ), DEBUG)
             table.remove(database[section]["stacks"], i)
+        elseif stack.details.nbt == nbt then
+            remove_nbt = false
+        end
+    end
+
+    -- If the stack removed was the last having this NBT,
+    -- remove it from the NBT list.
+    if remove_nbt then
+        for i,hash in ipairs(database[section]["nbt"]) do
+            if hash == nbt then
+                table.remove(database[section]["nbt"], i)
+            end
         end
     end
 end

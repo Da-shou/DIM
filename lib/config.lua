@@ -42,6 +42,7 @@ config.OUTPUT_STORAGE_NAME = "minecraft:barrel_205"
 config.MIN_EXTRACTION_REQUEST_COUNT = 1
 config.MAX_EXTRACTION_REQUEST_COUNT = 1728 -- 64 x 27
 
+config.MAX_DISPLAY_DISPLAYNAME_LENGTH = 38
 config.MAX_DISPLAY_NAME_LENGTH = 38
 -- The modulo value to set the frequency of loading updates.
 -- A higher value means less loading updates ; less screen clutter.

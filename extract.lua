@@ -36,6 +36,10 @@ local function end_program()
     return true
 end
 
+-- Getting the extraction inventory ready
+local OUT = config.OUTPUT_STORAGE_NAME
+local output = peripheral.wrap(OUT)
+
 if not INPUT_ID then
     utils.log("Please enter the ID of the item wanted.\n", INFO)
     write("> ")
@@ -54,7 +58,68 @@ for i,choice in ipairs(choices) do
     end
 end
 
-if not INPUT_COUNT then
+-- Getting the JSON database as a Lua object
+local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+if not db then
+    utils.log("Database couldn't be read.", ERROR) 
+    return 
+end
+
+local chosen_nbt = nil
+
+-- Checking if the item sectin has nbt hashes
+if table.getn(db[INPUT_ID]["nbt"]) > 0 then
+    utils.log("Item requested has NBT hashes.", DEBUG)
+
+    -- Getting all NBT hashes
+    local nbt_hashes = db[INPUT_ID]["nbt"]
+
+    -- Prepare table to show to user
+    local nbt_display_data = {}
+    local name_w = 0
+
+    for _,hash in ipairs(nbt_hashes) do
+        local nbt_search_results = utils.search_database_for_item(db, INPUT_ID, false, hash)
+        local variant_display_name, _, variant_total, _ = table.unpack(nbt_search_results)
+
+        local w = string.len(variant_display_name)
+        if name_w < string.len(variant_display_name) then name_w = w end
+
+        table.insert(nbt_display_data, {variant_display_name, "x", variant_total, hash})
+    end
+
+    -- Checking if there are items without NBT as well.
+    local default_search_results = utils.search_database_for_item(db, INPUT_ID, false)
+
+    if default_search_results then
+        local default_display_name, _, default_total, _ = table.unpack(default_search_results)
+        table.insert(nbt_display_data, {default_display_name, "x", default_total, "DEFAULT"})
+    end
+
+    chosen_nbt = utils.paged_tabulate_fixed_choice(
+        nbt_display_data,
+        {"<Name>", "<x>", "<Qty>", "<Nbt>"},
+        {name_w, 3, 5, 32},
+        {false,false,false,false}
+    )[4]
+
+    utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt), DEBUG)
+end
+
+if chosen_nbt == "DEFAULT" then chosen_nbt = nil end
+local request = utils.search_database_for_item(db, INPUT_ID, false, chosen_nbt)
+
+-- Checking if item is in storage and enough items are in storage
+if not request then
+    utils.log("Item could not be found in storage.", WARN)
+    if end_program() then return end
+end
+
+local storage_total = request[3]
+
+utils.log("Results have been found for extraction.", DEBUG)
+
+if not INPUT_COUNT or chosen_nbt then
     utils.log("Please enter the amount wanted.\n", INFO)
     write("> ")
     INPUT_COUNT = read()
@@ -77,26 +142,6 @@ if INPUT_COUNT:match("^%d+$") then
     end
 end
 
-utils.log("Now scanning for requested content...", DEBUG)
-
--- Getting the extraction inventory ready
-local OUT = config.OUTPUT_STORAGE_NAME
-local output = peripheral.wrap(OUT)
-
-local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
-
-local request = utils.search_database_for_item(db, INPUT_ID, false)
-
--- Checking if item is in storage and enough items are in storage
-if not request then
-    utils.log("Item could not be found in storage.", WARN)
-    if end_program() then return end
-end
-
-local storage_total = request[3]
-
-utils.log("Results have been found for extraction.", DEBUG)
-
 if REQUEST_COUNT > storage_total then
     utils.log("Not enough items in storage to perform extraction.", END)
     if end_program() then return end
@@ -104,9 +149,10 @@ end
 
 utils.log("Enough items are present in the storage to extract.", DEBUG)
 
--- Getting all stacks of needed items.
-local item_stacks = utils.search_database_for_item(db, INPUT_ID, true)
+utils.log("Now scanning for requested content...", DEBUG)
 
+-- Getting all stacks of needed items.
+local item_stacks = utils.search_database_for_item(db, INPUT_ID, true, chosen_nbt)
 local item_name = nil
 local item_max_stacksize = 1
 
@@ -118,6 +164,8 @@ else
     utils.log("Details about the stacks could not be extracted.", ERROR)
     if end_program() then return end
 end
+
+-- Ask user to choose which item variant they want extracted.
 
 utils.log(("Found max stack size for %s : %d"):format(item_name, item_max_stacksize), DEBUG)
 
@@ -133,16 +181,19 @@ local min_slots_needed = nb_stack_toextract + utils.fif(nb_rest_toextract > 0, 1
 local output_nb_usable_slots = 0
 local output_content = output.list()
 
+-- Checking if the slots are empty
 for i=1,output.size() do
-    if output_content[i] == nil or output_content[i].name == item_name then 
+    if output_content[i] == nil then 
         output_nb_usable_slots = output_nb_usable_slots + 1
     end
 end
 
+-- If there aren't enough empty slots in the output.
 if output_nb_usable_slots < min_slots_needed then
     utils.log(([[The output storage does not have enough free slots 
-    to process this extraction. Please free %d slots and try again.
-    DIM always needs at least one empty slot in output to function safely.]]):format(
+        to process this extraction. Please free %d slots and try again.
+        DIM extraction always needs at least one empty 
+        slot in output to function safely.]]):format(
         min_slots_needed-output_nb_usable_slots
     ), WARN)
     if end_program() then return end

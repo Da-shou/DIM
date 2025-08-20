@@ -74,15 +74,26 @@ local display_list = {}
 -- Iterate over every possible item type that matches the search
 for _,c in ipairs(candidates) do
     local section = database[c]
-    if section and table.getn(section["stacks"]) > 0 then
-        local section_nbt = section["nbt"]
-        if section_nbt and table.getn(section_nbt) > 0 then
-            for _,nbt in ipairs(section_nbt) do
-                utils.log(("Searching item with NBT %s"):format(nbt), DEBUG)
-                table.insert(display_list, (utils.search_database_for_item(database, c, display_details, nbt)))
+    if section then 
+        local section_stacks = section["stacks"]
+        if table.getn(section_stacks) > 0 then
+            local section_nbt = section["nbt"]
+
+            if section_nbt and table.getn(section_nbt) > 0 then
+                for _,stack in ipairs(section_stacks) do
+                    if not stack.details.nbt then
+                        table.insert(display_list, (utils.search_database_for_item(database, c, display_details)))
+                        break
+                    end
+                end
+
+                for _,nbt in ipairs(section_nbt) do
+                    utils.log(("Searching item with NBT %s"):format(nbt), DEBUG)
+                    table.insert(display_list, (utils.search_database_for_item(database, c, display_details, nbt)))
+                end
+            else
+                table.insert(display_list, (utils.search_database_for_item(database, c, display_details)))
             end
-        else
-            table.insert(display_list, (utils.search_database_for_item(database, c, display_details)))
         end
     end
 end
@@ -111,6 +122,16 @@ if table.getn(display_list) > 0 then
         end
     end
 
+    local max = utils.fif(
+        display_details,
+        config.MAX_DISPLAY_NAME_LENGTH,
+        config.MAX_DISPLAY_DISPLAYNAME_LENGTH
+    )
+
+    if best > max then
+        best = max
+    end
+
     if best > config.MAX_DISPLAY_NAME_LENGTH then best = config.MAX_DISPLAY_NAME_LENGTH end
 
     -- Beginning to print the results of the search
@@ -124,7 +145,13 @@ if table.getn(display_list) > 0 then
                 -- id of storage.
                 line[1] = line[1]:match(":(.*)") or line[1]
 
-                table.insert(line, 1, i)
+                table.insert(line,1,i)
+
+                -- Getting rid of maxcount
+                table.remove(line,9)
+                -- Getting rid of displayName
+                table.remove(line,9)
+
                 table.insert(detailed_rows, line)
             end
         end
@@ -133,8 +160,8 @@ if table.getn(display_list) > 0 then
         utils.paged_tabulate_fixed(
             detailed_rows,
             {"<#>","<Storage>", "@", "<s>", "<ID>", "x", "<Qty>", "<Nbt>"}, 
-            {3,11,1,3,best,1,5,20},
-            {false,true,false,false,false,false,false,false,}
+            {3,11,1,3,best,1,5,32},
+            {false,true,false,false,false,false,false,false}
         )
     else
         -- Sort results by quantity if search all
@@ -148,8 +175,8 @@ if table.getn(display_list) > 0 then
     
         utils.paged_tabulate_fixed(
             display_list, 
-            {"<#>", "<Name>", "x", "<Qty>"}, 
-            {4,best,1,6},
+            {"<#>", "<Name>", "x", "<Qty>", "<Stk>"}, 
+            {4,best,1,6,5},
             {false,false,false}
         )
     end
