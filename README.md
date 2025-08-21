@@ -6,10 +6,11 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 |Status|Goal|
 |-|-
 |✔|Create an item database from an existing item storage.
-|✔| Send items into the network through an input storage inventory.
+|✔|Send items into the network through an input storage inventory.
 |✔|Search (quickly !) for items in the network, including unique items (Potions, named items, etc..).
-|✔| Extract items from the network to an output storage inventory.
-|**WIP**|Find a nice way for the user to extract unique items.
+|✔|Extract items from the network to an output storage inventory.
+|✔|Find a nice way for the user to extract unique items.
+|**WIP**|See details about any stack of items.
 |❌|See miscelleanous storage statistics.
 |❌|Make a user-friendly interface.
 
