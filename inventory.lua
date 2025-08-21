@@ -81,14 +81,35 @@ for i,name in ipairs(inv_names) do
 
     stats.total_slots = stats.total_slots + slot_count
 
+    local list = inventory.list()
+    
+    -- If storage is completely empty
+    if table.getn(list) == 0 then 
+        for j=1, slot_count do
+            term.clearLine()
+            utils.log(("Found empty space in slot %d @ %s"):format(j,name), INFO)
+            utils.add_stack_to_db(database,"empty_slot",j,name,{count = 0, maxCount = 0})
+
+            -- Progress calculations
+            inventory_progress = (j/slot_count-1)/inventories_count
+            total_progress = ((inventory_progress) + (i / inventories_count))*100
+
+            -- Logging progress
+            if math.mod(loading_index,LM) == 0 then
+                term.clearLine()
+                utils.log(("%.1f%% done."):format(total_progress), INFO)
+                term.setCursorPos(x,y)
+            end
+        end
+        goto continue
+    end
+
     -- Parse the current inventory
     for j=1,slot_count do
-        local list = inventory.list()
-
         if list[j] then
             local details = inventory.getItemDetail(j)
             term.clearLine()
-            utils.log(("Found stack of <%s> in slot %d @ %s"):format(details.name,j,name), INFO)
+            utils.log(("<%s> in slot %d @ %s"):format(details.name,j,name), INFO)
             -- Adding the items to the storage object.
             if details and details.name then
                 utils.add_stack_to_db(database,details.name,j,name,details)
@@ -113,6 +134,8 @@ for i,name in ipairs(inv_names) do
 
         loading_index = loading_index + 1
     end
+
+    ::continue::
 end
 
 term.clearLine()

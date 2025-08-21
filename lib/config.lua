@@ -36,9 +36,9 @@ config.STORAGE_TYPE = "minecraft:barrel"
 config.STORAGE_TYPE_SLOTS = 27
 
 -- The network name of the insertion inventory
-config.INPUT_STORAGE_NAME = "minecraft:barrel_13"
+config.INPUT_STORAGE_NAME = "minecraft:barrel_155"
 -- The network name of the extraction inventory
-config.OUTPUT_STORAGE_NAME = "minecraft:barrel_12"
+config.OUTPUT_STORAGE_NAME = "minecraft:barrel_154"
 
 config.MIN_EXTRACTION_REQUEST_COUNT = 1
 config.MAX_EXTRACTION_REQUEST_COUNT = 1728 -- 64 x 27

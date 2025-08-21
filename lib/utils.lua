@@ -519,8 +519,18 @@ end
 -- inv_name[string]     : Name of the inventory where the stack is stored.
 -- details[Object]      : Object containing item details from getItemDetail
 function utils.add_stack_to_db(database, section, slot, inv_name, details)
-    if not database then return end
+    if not database then 
+        utils.log("Could not get database JSON object.", ERROR)
+        return 
+    end
 
+    local stats = utils.get_json_file_as_object(config.STATS_FILE_PATH)
+    if not stats then
+        utils.log("Could not get statistics JSON object.", ERROR)
+        return
+    end
+
+    -- Remove the empty slot that is now taken by the stack
     if database["empty_slot"] then
         for i,empty_slot in ipairs(database["empty_slot"]["stacks"]) do
             if empty_slot.source == inv_name and empty_slot.slot == slot then
@@ -555,6 +565,13 @@ function utils.add_stack_to_db(database, section, slot, inv_name, details)
             source = inv_name,
             ["details"] = details
     })
+
+    if details.count > 0 then
+        -- Updating the statistic counter.
+        stats.used_slots = stats.used_slots + 1
+        STATS_JSON = textutils.serializeJSON(stats)
+        utils.write_json_string_in_file(config.STATS_FILE_PATH, STATS_JSON)
+    end
 end
 
 -- Removes a stack of items to the JSON database. Used when extracting an
