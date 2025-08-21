@@ -10,6 +10,7 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 |✔|Search (quickly !) for items in the network, including unique items (Potions, named items, etc..).
 |✔|Extract items from the network to an output storage inventory.
 |✔|Find a nice way for the user to extract unique items.
+|**WIP**|Optimize extraction time because first strategy is very ineffective.
 |**WIP**|See details about any stack of items.
 |❌|See miscelleanous storage statistics.
 |❌|Make a user-friendly interface.
