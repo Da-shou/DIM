@@ -10,10 +10,28 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 **WIP** Find a nice way for the user to extract unique items.
 ❌ See miscelleanous storage statistics.
 ❌ Make a user-friendly interface.
+=======
+|Status|Goal|
+|-|-
+|✔|Create an item database from an existing item storage.
+|✔|Send items into the network through an input storage inventory.
+|✔|Search (quickly !) for items in the network, including unique items (Potions, named items, etc..).
+|✔|Extract items from the network to an output storage inventory.
+|✔|Find a nice way for the user to extract unique items.
+|**WIP**|Optimize extraction time because first strategy is very ineffective.
+|**WIP**|See details about any stack of items.
+|❌|See miscelleanous storage statistics.
+|❌|Make a user-friendly interface.
 
 ### ⚙ Secondary goals
 ❌ Create an account system, which keeps tracks of who has which items.
 ❌ After a login, actions and disconnect, the history of insertions and extractions is kept.
 ❌ The last actions can be printed on paper.
 
+#### Suggestions
+- Since the tables that the program will display can be quite large, I recommand extending the size of the computers interface in the ComputerCraft server config.
+  - If this is isn't possible, displaying the results on a monitor that has at least a width of 2 and a text scale of 0.5 will provide the best experience.
+  - It is also possible to change the width of each columns in the DIM config.lua file. If the columns are too thin, the content *WILL* get truncated. Be careful !
+
+#### Notes
 For balance reasons that I am the sole judge of, this is made to only work on wired networks.
