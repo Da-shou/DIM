@@ -92,7 +92,10 @@ for _,c in ipairs(candidates) do
                     table.insert(display_list, (utils.search_database_for_item(database, c, display_details, nbt)))
                 end
             else
-                table.insert(display_list, (utils.search_database_for_item(database, c, display_details)))
+                local default_results = (utils.search_database_for_item(database, c, display_details))
+                if table.getn(default_results) > 0 then
+                    table.insert(display_list, default_results)
+                end
             end
         end
     end
@@ -140,7 +143,7 @@ if table.getn(display_list) > 0 then
 
         -- Extract lines from the groups returned by search_database_for_item
         for i,group in ipairs(display_list) do
-            for j,line in ipairs(group) do
+            for _,line in ipairs(group) do
                 -- Removing the first part of the id to only get the name and
                 -- id of storage.
                 line[1] = line[1]:match(":(.*)") or line[1]

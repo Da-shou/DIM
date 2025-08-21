@@ -17,6 +17,7 @@ config.BASE_PATH = "/dim"
 -- the informations about each and every item.
 config.DATABASE_FILE_PATH = config.BASE_PATH.."/storage/db.json"
 config.INVENTORIES_FILE_PATH = config.BASE_PATH.."/storage/inventories.json"
+config.STATS_FILE_PATH = config.BASE_PATH.."/storage/stat.json"
 -- The location and name of the JSON file containing the names
 -- of all the items in the game. Allows for indexed searching in
 -- the database.
@@ -35,15 +36,15 @@ config.STORAGE_TYPE = "minecraft:barrel"
 config.STORAGE_TYPE_SLOTS = 27
 
 -- The network name of the insertion inventory
-config.INPUT_STORAGE_NAME = "minecraft:barrel_204"
+config.INPUT_STORAGE_NAME = "minecraft:barrel_13"
 -- The network name of the extraction inventory
-config.OUTPUT_STORAGE_NAME = "minecraft:barrel_205"
+config.OUTPUT_STORAGE_NAME = "minecraft:barrel_12"
 
 config.MIN_EXTRACTION_REQUEST_COUNT = 1
 config.MAX_EXTRACTION_REQUEST_COUNT = 1728 -- 64 x 27
 
 config.MAX_DISPLAY_DISPLAYNAME_LENGTH = 38
-config.MAX_DISPLAY_NAME_LENGTH = 38
+config.MAX_DISPLAY_NAME_LENGTH = 26
 -- The modulo value to set the frequency of loading updates.
 -- A higher value means less loading updates ; less screen clutter.
 config.LOADING_MODULO = 1
@@ -57,6 +58,8 @@ config.LOGTYPE_INFO = "INFO"
 config.LOGTYPE_END = "ENDING"
 config.LOGTYPE_BEGIN = "BEGIN"
 
+config.SHOW_DEBUG = false
+
 -- Change the different types of log messages to show during execution. 
 -- I recommand to keep as default.
 config.displayed_logtypes = {
@@ -66,7 +69,7 @@ config.displayed_logtypes = {
     config.LOGTYPE_INFO,
     config.LOGTYPE_ERROR,
     config.LOGTYPE_WARNING,
-    --config.LOGTYPE_DEBUG,
+    config.LOGTYPE_DEBUG,
 }
 
 return config

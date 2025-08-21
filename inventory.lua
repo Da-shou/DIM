@@ -52,6 +52,10 @@ local inv_names, inv_count = get_inventories()
 -- Creating the lua object that will hold all of our
 -- item data which will then be serialized to JSON.
 local database = {}
+local stats = {
+    total_slots = 0,
+    used_slots = 0
+}
 
 utils.log(("Now indexing storage with %d inventories...")
     :format(inv_count), INFO)
@@ -71,44 +75,43 @@ for i,name in ipairs(inv_names) do
     -- Counting the items in the current inventory for loading
     -- display.
     local slot_count = 0
-    for _ in pairs(inventory.list()) do
+    for _=1,inventory.size() do
         slot_count = slot_count + 1
     end
 
+    stats.total_slots = stats.total_slots + slot_count
+
     -- Parse the current inventory
-    local current_slot_index = 0
-    local emptyInv = true
-    for slot, _ in pairs(inventory.list()) do
-        emptyInv = false
-        local details = inventory.getItemDetail(slot)
-        
-        -- Adding the items to the storage object.
-        if details and details.name then
-            utils.add_stack_to_db(database,details.name,slot,name,details)
+    for j=1,slot_count do
+        local list = inventory.list()
+
+        if list[j] then
+            local details = inventory.getItemDetail(j)
+            term.clearLine()
+            utils.log(("Found stack of <%s> in slot %d @ %s"):format(details.name,j,name), INFO)
+            -- Adding the items to the storage object.
+            if details and details.name then
+                utils.add_stack_to_db(database,details.name,j,name,details)
+            end
+            stats.used_slots = stats.used_slots + 1
+        else
+            term.clearLine()
+            utils.log(("Found empty space in slot %d @ %s"):format(j,name), INFO)
+            utils.add_stack_to_db(database,"empty_slot",j,name,{count = 0, maxCount = 0})
         end
 
         -- Progress calculations
-        inventory_progress = ((current_slot_index)/slot_count-1)/table.getn(inv_names)
+        inventory_progress = (j/slot_count-1)/inventories_count
         total_progress = ((inventory_progress) + (i / inventories_count))*100
 
         -- Logging progress
         if math.mod(loading_index,LM) == 0 then
-            utils.log(("%.1f%% done."):format(total_progress), INFO)
             term.clearLine()
+            utils.log(("%.1f%% done."):format(total_progress), INFO)
             term.setCursorPos(x,y)
         end
 
-        current_slot_index = current_slot_index + 1
         loading_index = loading_index + 1
-    end
-
-    -- Update the loading if the inventory was empty
-    if emptyInv then
-        inventory_progress = 1/inventories_count
-        total_progress = ((inventory_progress) + (i / inventories_count))*100
-        utils.log(("%.1f%% done."):format(total_progress), INFO)
-        term.clearLine()
-        term.setCursorPos(x,y)
     end
 end
 
@@ -116,6 +119,9 @@ term.clearLine()
 term.setCursorPos(x,y)
 utils.log(("100.0% done."), INFO)
 utils.log("Indexing complete !", INFO)
+utils.log(("%d inventories indexed."):format(inv_count), INFO)
+utils.log(("%d empty slots left."):format(stats.total_slots-stats.used_slots), INFO)
+utils.log(("%.1f%% of storage used."):format((stats.used_slots/stats.total_slots)*100), INFO)
 
 local db_did_save = utils.save_database_to_JSON(database)
 
@@ -131,6 +137,10 @@ local JSON_NAMES = textutils.serializeJSON(inv_names)
 -- Writing the inventory names to a JSON file for future use by other
 -- programs.
 utils.write_json_string_in_file(config.INVENTORIES_FILE_PATH, JSON_NAMES)
+
+-- Writing the stats object to a new file.
+local JSON_STATS = textutils.serializeJSON(stats)
+utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
 
 -- End program
 utils.log("Inventory program successfully ended.", END)

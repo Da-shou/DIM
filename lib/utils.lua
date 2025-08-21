@@ -38,17 +38,13 @@ end
 -- content[string] : content to show on screen
 -- type[config.displayed_logtypes] : logtype to show on screen, before log.
 function utils.log(content, type)
-    local log_pattern = "C%d@%s <%s> %s"
-    for _, allowed_type in ipairs(config.displayed_logtypes) do        
-        if type == config.LOGTYPE_ERROR then
-            printError(log_pattern:
-                format(os.getComputerID(),utils.get_local_time(),type,content))
-            break
-        elseif type == allowed_type then    
-            print(log_pattern:
-                format(os.getComputerID(),utils.get_local_time(),type,content))
-            break
-        end
+    local log_pattern = "C%d@%s <%s> %s"   
+    if type == config.LOGTYPE_ERROR then
+        printError(log_pattern:
+            format(os.getComputerID(),utils.get_local_time(),type,content))
+    elseif type ~= config.LOGTYPE_DEBUG or (type == config.LOGTYPE_DEBUG and config.SHOW_DEBUG) then
+        print(log_pattern:
+            format(os.getComputerID(),utils.get_local_time(),type,content))
     end
 end
 
@@ -187,10 +183,10 @@ end
 -- rightAlign[boolean]          : if true, adds spaces to the right. Defaults to false.
 -- left_space[number]           : space to add to the left of each row, defaults to 0
 local function tabulate_fixed(rows, widths, right_align, left_space)
-    if not left_space then left_space = 0 end
+    if left_space == nil then left_space = 0 end
     for _, row in ipairs(rows) do
         local out = {}
-        table.insert(out, string.rep(" ", left_space))
+        if left_space > 0 then table.insert(out, string.rep(" ", left_space)) end
         for i, cell in ipairs(row) do
             local w = widths[i] or 8  -- default width
             local r = right_align and right_align[i] or false
@@ -304,7 +300,7 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
     local h_space = h-5
 
     -- Space for rows only.
-    local h_space_rows = h_space-2
+    local h_space_rows = h_space-3
     local current_page_rows = {}
 
     -- Calculate number of pages needed
@@ -334,11 +330,15 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
                     table.remove(row,1)
                 end
                 -- Returns the data on the line of the cursor.
-                return data[cursor_pos]
+                return data[(cursor_pos) + start_id]
             end
         end
 
-        local y_limit = math.min(table.getn(data), h_space_rows)
+        local y_limit = utils.fif(
+            current_page == nb_page_needed,
+            table.getn(data) % h_space_rows,
+            h_space_rows
+        )
 
         -- Changing page if we hit bottom or top.
         if cursor_pos > y_limit then
@@ -356,11 +356,12 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
             if current_page == 1 then
                 -- If first page, go to last page.
                 current_page = nb_page_needed
+                cursor_pos = table.getn(data) % h_space_rows
             elseif current_page > 1 then
                 -- If not, go to previous
                 current_page = current_page - 1
+                cursor_pos = h_space_rows
             end
-            cursor_pos = y_limit
         end
 
         start_id = h_space_rows*(current_page-1)
@@ -369,13 +370,13 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
         for i=1,h_space do
             local k = start_id + i
             if k <= table.getn(data) then
-                table.insert(current_page_rows, data[k])
-
-                if k == cursor_pos then
+                if i == cursor_pos then
                     data[k][1] = cursor_char
                 else
                     data[k][1] = ""
                 end
+
+                table.insert(current_page_rows, data[k])
 
                 if table.getn(current_page_rows) == h_space_rows then break end
             end
@@ -444,9 +445,11 @@ end
 --
 -- database[Object]         : Lua object taken from the JSON file.
 -- name[string]             : Name (ID) of the item being searched.
--- detailed_output[boolean] : Changes the output to detailed results if true.
--- nbt[string]              : NBT string if stack has one. Can be nil. 
-function utils.search_database_for_item(database, name, detailed_output, nbt)
+-- detailed_output[boolean] : Changes the output return a list of stacks if true.
+-- nbt[string]              : NBT string if stack has one. Can be nil.
+-- partial_only[boolean]    : if true, returns only stacks that aren't at their maxCount. 
+--                            default to false. has no effect on simple display.
+function utils.search_database_for_item(database, name, by_stack, nbt, partial_only)
     local detailed_results = {}
     local item_type = database[name]
     local display_name = ""
@@ -463,24 +466,26 @@ function utils.search_database_for_item(database, name, detailed_output, nbt)
                 display_name = stack.details.displayName
                 total = total + stack.details.count
                 stack_max_size = stack.details.maxCount
-                
-                if detailed_output then
-                    table.insert(detailed_results,{
-                        stack.source,
-                        "@",
-                        stack.slot,
-                        name,
-                        "x",
-                        stack.details.count,
-                        stack.details.nbt,
-                        stack.details.maxCount,
-                        stack.details.displayName
-                    })
+
+                if by_stack then
+                    if not partial_only or (partial_only and stack.details.count < stack.details.maxCount) then
+                        table.insert(detailed_results,{
+                            stack.source,
+                            "@",
+                            stack.slot,
+                            name,
+                            "x",
+                            stack.details.count,
+                            stack.details.nbt,
+                            stack.details.maxCount,
+                            stack.details.displayName
+                        })
+                    end
                 end
             end
         end
 
-        if not detailed_output then
+        if not by_stack then
             return {display_name, "x", total, stack_max_size}
         else
             return detailed_results
@@ -505,14 +510,6 @@ function utils.sort_results_from_db_search(results, field_nb, ascending)
     )
 end
 
-function utils.shuffle_list(list)
-    for i = table.getn(list), 2, -1 do
-    local j = math.random(i) -- pick random index from 1..i
-    list[i], list[j] = list[j], list[i] -- swap
-    end
-    return list
-end
-
 -- Adds a stack of items to the JSON database. Is used when a new empty slot is
 -- filled with items.
 --
@@ -523,6 +520,15 @@ end
 -- details[Object]      : Object containing item details from getItemDetail
 function utils.add_stack_to_db(database, section, slot, inv_name, details)
     if not database then return end
+
+    if database["empty_slot"] then
+        for i,empty_slot in ipairs(database["empty_slot"]["stacks"]) do
+            if empty_slot.source == inv_name and empty_slot.slot == slot then
+                table.remove(database["empty_slot"]["stacks"], i)
+                break
+            end
+        end
+    end
 
     -- Checking if item has a section, if not, create it with
     -- both the stacks and nbt groups.
@@ -585,6 +591,8 @@ function utils.remove_stack_from_db(database, section, slot, source, nbt)
             end
         end
     end
+
+    utils.add_stack_to_db(database,"empty_slot",slot,source,{count=0, maxCount=0})
 end
 
 -- Updates a stack of items to the JSON database. Used when extracting a

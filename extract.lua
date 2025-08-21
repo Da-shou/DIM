@@ -93,7 +93,9 @@ if table.getn(db[INPUT_ID]["nbt"]) > 0 then
 
     if default_search_results then
         local default_display_name, _, default_total, _ = table.unpack(default_search_results)
-        table.insert(nbt_display_data, {default_display_name, "x", default_total, "DEFAULT"})
+        if default_total > 0 then
+            table.insert(nbt_display_data, {default_display_name, "x", default_total, "DEFAULT"})
+        end
     end
 
     chosen_nbt = utils.paged_tabulate_fixed_choice(
@@ -120,7 +122,7 @@ local storage_total = request[3]
 utils.log("Results have been found for extraction.", DEBUG)
 
 if not INPUT_COUNT or chosen_nbt then
-    utils.log("Please enter the amount wanted.\n", INFO)
+    utils.log(("Please enter the amount wanted (%d in storage)\n"):format(storage_total), INFO)
     write("> ")
     INPUT_COUNT = read()
     print()

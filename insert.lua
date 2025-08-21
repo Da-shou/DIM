@@ -21,8 +21,6 @@ local BEGIN = config.LOGTYPE_BEGIN
 local INFO = config.LOGTYPE_INFO
 local END = config.LOGTYPE_END
 
-math.randomseed(os.time())
-
 utils.reset_terminal()
 
 -- Program startup
@@ -42,9 +40,6 @@ if not inv_names then
     return
 end
 
-utils.shuffle_list(inv_names)
-
-local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
 if not inv_names then
     utils.log("No database cache was found. Please run inventory program.", ERROR)
     return
@@ -54,7 +49,7 @@ end
 function is_input_empty()
     local empty = true
     input_stacks = input.list()
-    for _ in pairs(input_stacks) do
+    for _,_ in pairs(input_stacks) do
         empty = false
         
         if not empty then
@@ -82,61 +77,66 @@ end
 -- max_stack_size (number) : Max stack size of the item.
 -- quantity (number)       : Quantity to be inserted. Used for logging purposes.
 -- nbt (string)            : Optional NBT value to differentiate items like tipped arrows.
-function find_available_slot(inv, item_name, max_stack_size, quantity, nbt)
-    -- Getting the item list of the output inventory
-    local items = inv.list()
-    
-    -- Getting the number of slots of the output inventory
-    local size = inv.size()
-    local inv_name = peripheral.getName(inv)    
-    
+function find_available_slot(database, item_name, max_stack_size, quantity, nbt)
+    local skip_partial_search = false
+    utils.log(("Starting slot search for %d x %s..."):format(quantity, item_name), DEBUG)
+
     -- If the max_stack_size is 1, no need to search for partial slots.
-    if (max_stack_size == 1) then goto empty_slot_search end
+    if (max_stack_size == 1) then skip_partial_search = true end
 
-    -- Iterating on the items in the output inventory and
-    -- try to find a partial stack containing the same item.
-    -- This is done first to try to complete a stack rather than using
-    -- an empty slot first.
-    for slot, stack in pairs(items) do
-        -- If found, put all possible items in this stack.
-        if stack.name == item_name and stack.count < max_stack_size then
-            -- If item has an NBT and is stackable (such as tipped arrows)
-            -- Check if NBT is same as stack found. If not, go to next slot.
-            if nbt ~= nil and stack.nbt ~= nbt then
-                utils.log(("Found stack of similar item but different NBT values. Going to next slot."), DEBUG)
-                goto continue
+    if not skip_partial_search then
+        utils.log("Entering partial search...", DEBUG)
+        -- Searching for partial stacks to complete.
+        -- Search for partial stacks in database.
+        local partial_stacks_search = utils.search_database_for_item(database,item_name,true,nbt,true)
+
+        if partial_stacks_search then
+            local stack_source  = nil
+            local stack_slot = nil
+            local stack_name = nil
+            local stack_count = nil
+            local stack_nbt = nil
+
+            -- Iterating in the results
+            for _,stack in ipairs(partial_stacks_search) do
+                stack_source = stack[1]
+                stack_slot = stack[3]
+                stack_name = stack[4]
+                stack_count = stack[6]
+                stack_nbt = stack[7]
+
+                if stack_name == item_name and stack_count < max_stack_size then
+                    if nbt and stack_nbt ~= nbt then
+                        utils.log(("Found stack of similar item but different NBT values. Going to next slot."), DEBUG)
+                        goto continue
+                    end
+                                
+                    -- Getting the space left in the stack
+                    local space_left = max_stack_size - stack_count
+
+                    utils.log(("Found a partially filled (%d items) slot (%d) in %s for %d x %s"):format(stack_count, stack_slot, stack_source, quantity, item_name), DEBUG)
+                    -- Information for pushItems so it pushes the correct amount of 
+                    -- items into the stack.
+                    return {stack_slot, stack_source, space_left}
+                end
+                ::continue::
             end
-            
-            -- Getting the space left in the stack
-            local space_left = max_stack_size - stack.count
-
-            utils.log(("Found a partially filled (%d items) slot (%d) in %s for %d x %s"):format(stack.count, slot, inv_name, quantity, item_name), DEBUG)
-            -- Information for pushItems so it pushes the correct amount of 
-            -- items into the stack.
-
-            return slot, space_left
         end
-        -- To be able to continue in the loop. 
-        -- Please add a continue statement Lua
-        ::continue::
     end
-    
+
     -- Logs if no partial storages were found.
-    utils.log(("Didn't find a partially filled slot in %s. Looking for empty slots..."):format(peripheral.getName(inv)), DEBUG)
-    
-    ::empty_slot_search::
-    -- Checks for empty slots now since no partial slots
-    -- were found in inventory.
-    for slot = 1, size do
-        if items[slot] == nil then
-            utils.log(("Found an empty slot (%d) in %s for %d x %s"):format(slot, inv_name, quantity, item_name), DEBUG)
-            return slot
-        end
+    utils.log(("Didn't find a partially filled slot. Looking for empty slots..."), DEBUG)
+
+    local empty_slots_search = utils.search_database_for_item(database, "empty_slot", true, nil, false)
+
+    if table.getn(empty_slots_search) > 0 then
+        utils.log("Found empty slot.", DEBUG)
+        return {empty_slots_search[1][3], empty_slots_search[1][1], nil}
     end
-    
+
     -- If no empty slots nor partial slots were found in the
-    -- inventory, then look in the next inventory.
-    utils.log(("Didn't find an empty slot in %s. Skipping to next inventory."):format(inv_name), DEBUG)
+    -- inventory, then look in the next inventory
+    utils.log(("Didn't find an empty slot."), DEBUG)
     
     -- If there wasn't any space found for the item, leave it in input
     -- and see if next items can be placed in storage.
@@ -154,6 +154,10 @@ local input_inventory_stack_count = get_input_stack_count()
 
 local progress = 0
 local input_stack_index = 0
+
+local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+if not db then return end
+
 -- Iterating over the items in the input storage. This is done first
 -- so that each item can see the full storage and find the optimal
 -- storing spot.
@@ -165,116 +169,126 @@ for input_slot, input_stack in pairs(input_stacks) do
     -- Checking if the slot is empty
     if input_stacks[input_slot] ~= nil then
         -- Iterating over all of the storage inventories
-        
-        for _, output_name in ipairs(inv_names) do
-            utils.log(("Checking %s..."):format(output_name), DEBUG)
+
+        local output_slot, output_name, nb_to_insert
+
+        -- Getting the details of the stack so that we
+        -- can obtain the maxCount variable.
+        local stack_details = input.getItemDetail(input_slot) 
+
+        local item_nbt = nil;
+
+        if stack_details.nbt then
+            item_nbt = stack_details.nbt
+        end
+
+        -- Finding a slot to put the stack in.
+        local slot_search_results = find_available_slot(
+            db,
+            stack_details.name,
+            stack_details.maxCount,
+            stack_details.count,
+            item_nbt
+        )
+
+        if slot_search_results then
+            output_slot, output_name, nb_to_insert = table.unpack(slot_search_results)
+                utils.log(("Found space for %d items in slot %d @ %s"):format(
+                utils.fif(nb_to_insert, nb_to_insert, stack_details.maxCount), 
+                output_slot,
+                output_name), DEBUG)
+        end
+
+        -- Inserted count will be used to update the JSON database.            
+        local inserted_count = 0   
+        local partial_insert = false
             
-            -- Getting the output inventory commands
-            local output = peripheral.wrap(output_name)
-            -- Getting the details of the stack so that we
-            -- can obtain the maxCount variable.
-            local stack_details = input.getItemDetail(input_slot) 
+        -- Get the number of items inserted
+        if nb_to_insert then
+            utils.log(("Pushing %d x <%s> in partial slot %d @ %s"):format(
+                nb_to_insert, stack_details.displayName, output_slot, output_name
+            ), DEBUG)
+            partial_insert = true
 
-            local item_nbt = nil;
-
-            if stack_details.nbt then
-                item_nbt = stack_details.nbt
-            end
-
-            -- Finding a slot to put the stack in.
-            local output_slot, remaining = find_available_slot(
-                output,
-                stack_details.name,
-                stack_details.maxCount,
-                stack_details.count,
-                item_nbt
+            inserted_count = input.pushItems(
+                output_name, 
+                input_slot, 
+                nb_to_insert, 
+                output_slot
             )
+        else
+            utils.log(("Pushing %d x %s in empty slot %d @ %s"):format(
+                stack_details.count, stack_details.displayName, output_slot, output_name
+            ), DEBUG)
+
+            inserted_count = input.pushItems(
+                output_name, 
+                input_slot, 
+                stack_details.maxCount, 
+                output_slot
+            )
+        end
+
+        -- If any items were inserted and a slot was chosen,
+        -- log the information. If the insertion inserted all of
+        -- the items and did not take a fraction of the stack,
+        -- break and go to the next item of input inventory.
+        if inserted_count and output_slot then
+            utils.log(("Item push success!"), DEBUG)                
+            local section = db[stack_details.name]
             
-            -- Inserted count will be used to update the JSON database.            
-            local inserted_count = 0   
-            local partial_insert = false
+            -- If we know a partial stack was modified
+            if partial_insert and section then
+                utils.log("Updating partial stack in JSON database", DEBUG)
+                -- Find the object that represents 
+                -- the stack to update its count
+                for _, triple in ipairs(section["stacks"]) do
+                    textutils.tabulate(table.unpack(triple))
+                    local db_details = triple["details"]
+                    local db_slot = triple["slot"]
+                    local db_source = triple["source"]
 
-            -- Get the number of items inserted
-            if remaining then 
-                inserted_count = input.pushItems(
-                    output_name, 
-                    input_slot, 
-                    remaining, 
-                    output_slot
-                )
-                partial_insert = true
-            else
-                inserted_count = input.pushItems(
-                    output_name,
-                    input_slot,
-                    stack_details.maxCount,
-                    output_slot
-                )
-            end
-
-            -- If any items were inserted and a slot was chosen,
-            -- log the information. If the insertion inserted all of
-            -- the items and did not take a fraction of the stack,
-            -- break and go to the next item of input inventory.
-            if inserted_count and output_slot then
-                if not db then return end
-
-                utils.log(("Inserted %d x %s in %s in slot %d"):format(inserted_count, input_stack.name, output_name, output_slot), DEBUG)                
-                local section = db[stack_details.name]
-                -- If we know a partial stack was modified
-                if partial_insert and section then
-                    utils.log("Updating existing stack in JSON database", DEBUG)
-                    -- Find the object that represents 
-                    -- the stack to update its count
-                    for _, triple in ipairs(section["stacks"]) do
-                        textutils.tabulate(table.unpack(triple))
-                        local db_details = triple["details"]
-                        local db_slot = triple["slot"]
-                        local db_source = triple["source"]
-
-                        if output_slot == db_slot and output_name == db_source then
-                            utils.log("Found correct stack in JSON file", DEBUG)
-                            local db_count = db_details["count"]
-                            utils.log(("%d => %d + %d"):format(db_count, db_count, inserted_count), DEBUG)
-                            
-                            if (db_count + inserted_count <= db_details["maxCount"]) then
-                                db_details["count"] = db_count + inserted_count
-                            else
-                                utils.log("Tried to add too many items to a stack.", ERROR)
-                            end
+                    if output_slot == db_slot and output_name == db_source then
+                        utils.log("Found correct stack in JSON file", DEBUG)
+                        local db_count = db_details["count"]
+                        utils.log(("%d => %d + %d"):format(db_count, db_count, inserted_count), DEBUG)
+                        
+                        if (db_count + inserted_count <= db_details["maxCount"]) then
+                            db_details["count"] = db_count + inserted_count
+                        else
+                            utils.log("Tried to add too many items to a stack.", ERROR)
                         end
                     end
-                else
-                    -- If we know an empty slot was used that means
-                    -- a new stack has to be created in the JSON file under
-                    -- the item section and that the section has to
-                    -- potentially be created too
-                    -- This does both.
-                    
-                    utils.log(("Adding new stack of %d x %s to the JSON database"):format(stack_details.count, stack_details.name), DEBUG)
-                    utils.add_stack_to_db(
-                        db,
-                        stack_details.name, 
-                        output_slot, 
-                        output_name, 
-                        stack_details
-                    )
                 end
+            else
+                -- If we know an empty slot was used that means
+                -- a new stack has to be created in the JSON file under
+                -- the item section and that the section has to
+                -- potentially be created too
+                -- This does both.
+                
+                utils.log(("Adding new stack of %d x %s to the JSON database"):format(stack_details.count, stack_details.name), DEBUG)
+                utils.add_stack_to_db(
+                    db,
+                    stack_details.name, 
+                    output_slot, 
+                    output_name, 
+                    stack_details
+                )
             end
+        end
 
-            if inserted_count == stack_details.count then
-                break
-            elseif inserted_count > 0 then
-                -- If only a fraction of the input stack was
-                -- because of completion of another stack,
-                -- start search for the same slot again.
-                utils.log("Fraction of stack was put in storage. Starting search again to find space for rest of the stack.", DEBUG)
-                goto search
-            end
+        if inserted_count > 0 and inserted_count < stack_details.count then
+            -- If only a fraction of the input stack was
+            -- because of completion of another stack,
+            -- start search for the same slot again.
+            utils.log("Fraction of stack was put in storage. Starting search again to find space for rest of the stack.", DEBUG)
+            goto search
         end
     end
 
     local x,y = term.getCursorPos()
+    
     -- Check if inventory is empty after storing an item from input.
     -- If true, all items have been stored.
     if is_input_empty() then
