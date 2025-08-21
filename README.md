@@ -21,4 +21,10 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 |❌|After a login, actions and disconnect, the history of insertions and extractions is kept.
 |❌|The last actions can be printed on paper.
 
+#### Suggestions
+- Since the tables that the program will display can be quite large, I recommand extending the size of the computers interface in the ComputerCraft server config.
+  - If this is isn't possible, displaying the results on a monitor that has at least a width of 2 and a text scale of 0.5 will provide the best experience.
+  - It is also possible to change the width of each columns in the DIM config.lua file. If the columns are too thin, the content *WILL* get truncated. Be careful !
+
+#### Notes
 For balance reasons that I am the sole judge of, this is made to only work on wired networks.
