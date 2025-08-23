@@ -658,4 +658,27 @@ function utils.save_database_to_JSON(database)
     return true
 end
 
+-- Returns UNIX timestamp at this moment in milliseconds.
+function utils.start_stopwatch()
+    return os.epoch("local")
+end
+
+-- Returns time that passed since begin was created in ms in a string.
+function utils.stop_stopwatch(start)
+    local time = 0
+    local unit = ""
+
+    local ms = (os.epoch("local") - start)
+
+    if ms / 1000 < 1 then
+        time = ms
+        unit = "ms"
+    else 
+        time = ms / 1000
+        unit = "s"
+    end
+
+    return (time.." "..unit):format(".3%f")
+end
+
 return utils

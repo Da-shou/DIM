@@ -29,6 +29,9 @@ config.REG_PATHS = {
     config.REGISTRY_COMPUTERCRAFT_ITEMS_PATH
 }
 
+-- Will show the logs marked as "DEBUG"
+config.SHOW_DEBUG = false
+
 -- The type of inventory to scan for
 config.STORAGE_TYPE = "minecraft:barrel"
 
@@ -57,19 +60,6 @@ config.LOGTYPE_SUCCESS = "SUCCESS"
 config.LOGTYPE_INFO = "INFO"
 config.LOGTYPE_END = "ENDING"
 config.LOGTYPE_BEGIN = "BEGIN"
-
-config.SHOW_DEBUG = false
-
--- Change the different types of log messages to show during execution. 
--- I recommand to keep as default.
-config.displayed_logtypes = {
-    config.LOGTYPE_BEGIN,
-    config.LOGTYPE_END,
-    config.LOGTYPE_SUCCESS,
-    config.LOGTYPE_INFO,
-    config.LOGTYPE_ERROR,
-    config.LOGTYPE_WARNING,
-    config.LOGTYPE_DEBUG,
-}
+config.LOGTYPE_TIMER = "TIMER"
 
 return config

@@ -20,9 +20,11 @@ local ERROR = config.LOGTYPE_ERROR
 local BEGIN = config.LOGTYPE_BEGIN
 local INFO = config.LOGTYPE_INFO
 local END = config.LOGTYPE_END
+local TIMER = config.LOGTYPE_TIMER
 
 utils.reset_terminal()
 
+local start = utils.start_stopwatch()
 -- Program startup
 utils.log("Beginning insertion...", BEGIN)
 utils.log("Scanning contents of desired input storage...", DEBUG)
@@ -328,5 +330,9 @@ if not db_did_save then
     return
 end
 
+local stop = utils.stop_stopwatch(start)
+
+-- End program
+utils.log(("Executed in %s"):format(stop), TIMER)
 -- End the program
 utils.log("Insertion ended successfully.", END)

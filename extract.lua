@@ -19,8 +19,10 @@ local END = config.LOGTYPE_END
 local WARN = config.LOGTYPE_WARNING
 local ERROR = config.LOGTYPE_ERROR
 local DEBUG = config.LOGTYPE_DEBUG
+local TIMER = config.LOGTYPE_TIMER
 
 utils.reset_terminal()
+
 -- Program startup
 utils.log("Beginning extraction program.", BEGIN)
 
@@ -68,7 +70,7 @@ end
 local chosen_nbt = nil
 
 -- Checking if the item sectin has nbt hashes
-if table.getn(db[INPUT_ID]["nbt"]) > 0 then
+if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
     utils.log("Item requested has NBT hashes.", DEBUG)
 
     -- Getting all NBT hashes
@@ -118,30 +120,36 @@ if not request then
 end
 
 local storage_total = request[3]
+local REQUEST_COUNT = nil
 
 utils.log("Results have been found for extraction.", DEBUG)
 
-if not INPUT_COUNT or chosen_nbt then
-    utils.log(("Please enter the amount wanted (%d in storage)\n"):format(storage_total), INFO)
-    write("> ")
-    INPUT_COUNT = read()
-    print()
-end
-
-local REQUEST_COUNT = nil
-if INPUT_COUNT:match("^%d+$") then
-    utils.log("Correctly got digit(s) in input.", DEBUG)
-    REQUEST_COUNT = tonumber(INPUT_COUNT)
-    if REQUEST_COUNT < config.MIN_EXTRACTION_REQUEST_COUNT or REQUEST_COUNT > config.MAX_EXTRACTION_REQUEST_COUNT then
-        utils.log(([[Number entered is too low/high ! 
-            Please enter a number between %d and %d]]):format(
-            config.MIN_EXTRACTION_REQUEST_COUNT, 
-            config.MAX_EXTRACTION_REQUEST_COUNT), WARN
-        )
-        if end_program() then return end
-    else
-        utils.log("Number entered is correctly in extraction range.", DEBUG)
+if storage_total > 1 then
+    if not INPUT_COUNT or chosen_nbt then
+        utils.log(("Please enter the amount wanted (%d in storage)\n"):format(storage_total), INFO)
+        write("> ")
+        INPUT_COUNT = read()
+        print()
     end
+
+
+    if INPUT_COUNT:match("^%d+$") then
+        utils.log("Correctly got digit(s) in input.", DEBUG)
+        REQUEST_COUNT = tonumber(INPUT_COUNT)
+        if REQUEST_COUNT < config.MIN_EXTRACTION_REQUEST_COUNT or REQUEST_COUNT > config.MAX_EXTRACTION_REQUEST_COUNT then
+            utils.log(([[Number entered is too low/high ! 
+                Please enter a number between %d and %d]]):format(
+                config.MIN_EXTRACTION_REQUEST_COUNT, 
+                config.MAX_EXTRACTION_REQUEST_COUNT), WARN
+            )
+            if end_program() then return end
+        else
+            utils.log("Number entered is correctly in extraction range.", DEBUG)
+        end
+    end
+else
+    utils.log(("Only 1 %s found in storage. Extracting..."):format(request[1]), DEBUG)
+    REQUEST_COUNT = 1
 end
 
 if REQUEST_COUNT > storage_total then
@@ -152,6 +160,7 @@ end
 utils.log("Enough items are present in the storage to extract.", DEBUG)
 
 utils.log("Now scanning for requested content...", DEBUG)
+local start = utils.start_stopwatch()
 
 -- Getting all stacks of needed items.
 local item_stacks = utils.search_database_for_item(db, INPUT_ID, true, chosen_nbt)
@@ -345,6 +354,10 @@ if not db_did_write then
     utils.log(("There was an error during the writing of changes to database."), ERROR)
 end
 
+local stop = utils.stop_stopwatch(start)
+
+-- End program
+utils.log(("Executed in %s"):format(stop), TIMER)
 -- End program
 utils.log("Extraction program successfully performed extraction.", INFO)
 end_program()

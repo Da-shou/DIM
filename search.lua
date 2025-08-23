@@ -17,9 +17,11 @@ local BEGIN = config.LOGTYPE_BEGIN
 local DEBUG = config.LOGTYPE_DEBUG
 local END = config.LOGTYPE_END
 local WARN = config.LOGTYPE_WARNING
-local ERROR = config.LOGTYPE_ERROR
+local TIMER = config.TIMER
 
 utils.reset_terminal()
+
+local start = utils.start_stopwatch()
 
 -- Getting the search query
 local search_query = arg[1]
@@ -187,4 +189,8 @@ else
     utils.log(("No results have been found for your search query <%s>"):format(search_query), INFO)
 end
 
+local stop = utils.stop_stopwatch(start)
+
+-- End program
+utils.log(("Executed in %s"):format(stop), TIMER)
 utils.log(("Search program ended.\n"):format(search_query), END)

@@ -17,6 +17,8 @@ local ERROR = config.LOGTYPE_ERROR
 local DEBUG = config.LOGTYPE_DEBUG
 local BEGIN = config.LOGTYPE_BEGIN
 local END = config.LOGTYPE_END
+local TIMER = config.LOGTYPE_TIMER
+local TIMER = config.TIMER
 
 local LM = config.LOADING_MODULO
 
@@ -43,8 +45,12 @@ function get_inventories()
     return results, table.getn(results) 
 end
 
+local start = utils.start_stopwatch()
+
 utils.log("Starting inventory program...", BEGIN)
 utils.log("Searching for inventories on the network...", INFO)
+
+
 
 -- Getting the inventories and the count
 local inv_names, inv_count = get_inventories()
@@ -144,7 +150,7 @@ utils.log(("100.0% done."), INFO)
 utils.log("Indexing complete !", INFO)
 utils.log(("%d inventories indexed."):format(inv_count), INFO)
 utils.log(("%d empty slots left."):format(stats.total_slots-stats.used_slots), INFO)
-utils.log(("%.1f%% of storage used."):format((stats.used_slots/stats.total_slots)*100), INFO)
+utils.log(("%.1f%% of empty slots used."):format((stats.used_slots/stats.total_slots)*100), INFO)
 
 local db_did_save = utils.save_database_to_JSON(database)
 
@@ -165,5 +171,8 @@ utils.write_json_string_in_file(config.INVENTORIES_FILE_PATH, JSON_NAMES)
 local JSON_STATS = textutils.serializeJSON(stats)
 utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
 
+local stop = utils.stop_stopwatch(start)
+
 -- End program
+utils.log(("Executed in %s"):format(stop), TIMER)
 utils.log("Inventory program successfully ended.", END)
