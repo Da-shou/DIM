@@ -18,7 +18,6 @@ local DEBUG = config.LOGTYPE_DEBUG
 local BEGIN = config.LOGTYPE_BEGIN
 local END = config.LOGTYPE_END
 local TIMER = config.LOGTYPE_TIMER
-local TIMER = config.TIMER
 
 local LM = config.LOADING_MODULO
 
@@ -174,5 +173,5 @@ utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
 local stop = utils.stop_stopwatch(start)
 
 -- End program
-utils.log(("Executed in %s"):format(stop), TIMER)
+utils.log(("<inventory> executed in %s"):format(stop), TIMER)
 utils.log("Inventory program successfully ended.", END)

@@ -318,12 +318,25 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
 
         if key then
             local pressed_key_name = keys.getName(key)
+            
             -- Updating cursor position based on input
             if pressed_key_name == "down" then
                 cursor_pos = cursor_pos + 1
             elseif pressed_key_name == "up" then 
                 cursor_pos = cursor_pos - 1
             -- Confirmation of choice
+            elseif pressed_key_name == "right" then
+                if current_page < nb_page_needed then
+                    current_page = current_page + 1
+                    cursor_pos = 1
+                end
+            elseif pressed_key_name == "left" then
+                if current_page > 1 then
+                    current_page = current_page - 1
+                    cursor_pos = 1
+                end
+            elseif pressed_key_name == "x" then
+                return nil
             elseif pressed_key_name == "enter" then
                 -- Removing the cursor column
                 for _,row in ipairs(data) do
@@ -393,8 +406,8 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
         table.insert(current_page_rows, 1, headers)
 
         -- Prompt the user to hit a key before showing next page.
-        utils.log(("%s"):format("Choose with <UP> and <DOWN>."), config.LOGTYPE_INFO)
-        utils.log(("%s"):format("Confirm your choice with <ENTER>."), config.LOGTYPE_INFO)
+        utils.log(("%s"):format("Choose with <UP>, <DOWN>, <LEFT> and <RIGHT>"), config.LOGTYPE_INFO)
+        utils.log(("%s"):format("Confirm with <ENTER>. Cancel with <X>"), config.LOGTYPE_INFO)
 
         print()
 
@@ -462,23 +475,22 @@ function utils.search_database_for_item(database, name, by_stack, nbt, partial_o
         -- If nbt == nil, will insert all stacks without NBTs.
         -- If nbt has a value, will insert all stacks with hash = nbt
         for _,stack in ipairs(item_type_stacks) do
+            display_name = stack.details.displayName
+            total = total + stack.details.count
+            stack_max_size = stack.details.maxCount
             if stack.details.nbt == nbt then
-                display_name = stack.details.displayName
-                total = total + stack.details.count
-                stack_max_size = stack.details.maxCount
-
                 if by_stack then
                     if not partial_only or (partial_only and stack.details.count < stack.details.maxCount) then
                         table.insert(detailed_results,{
-                            stack.source,
-                            "@",
-                            stack.slot,
-                            name,
-                            "x",
-                            stack.details.count,
-                            stack.details.nbt,
-                            stack.details.maxCount,
-                            stack.details.displayName
+                            source=stack.source,
+                            at="@",
+                            slot=stack.slot,
+                            name=name,
+                            x="x",
+                            count=stack.details.count,
+                            nbt=stack.details.nbt,
+                            maxCount=stack.details.maxCount,
+                            displayName=stack.details.displayName
                         })
                     end
                 end
@@ -486,8 +498,16 @@ function utils.search_database_for_item(database, name, by_stack, nbt, partial_o
         end
 
         if not by_stack then
-            return {display_name, "x", total, stack_max_size}
+            utils.log(("Returning simple infos about %s..."):format(name), DEBUG)
+            return {
+                displayName=display_name, 
+                x="x", 
+                total=total, 
+                stackMaxSize=stack_max_size,
+                name=name
+            }
         else
+            utils.log(("Returning detailed infos about %s..."):format(name), DEBUG)
             return detailed_results
         end
     end
@@ -497,14 +517,14 @@ end
 -- results[table]       : the results table to sort
 -- field_nb[number]     : the index of the field to sort with.
 -- ascending[boolean]   : (optional) if false, sorts in descending order. defaults to true.
-function utils.sort_results_from_db_search(results, field_nb, ascending)
+function utils.sort_results_from_db_search(results, field_id, ascending)
     if ascending == nil then ascending = true end
     table.sort(results, 
         function(a,b) 
             return utils.fif(
                 (ascending), 
-                (a[field_nb] < b[field_nb]), 
-                (a[field_nb] > b[field_nb])
+                (a[field_id] < b[field_id]), 
+                (a[field_id] > b[field_id])
             )
         end
     )
@@ -565,13 +585,6 @@ function utils.add_stack_to_db(database, section, slot, inv_name, details)
             source = inv_name,
             ["details"] = details
     })
-
-    if details.count > 0 then
-        -- Updating the statistic counter.
-        stats.used_slots = stats.used_slots + 1
-        STATS_JSON = textutils.serializeJSON(stats)
-        utils.write_json_string_in_file(config.STATS_FILE_PATH, STATS_JSON)
-    end
 end
 
 -- Removes a stack of items to the JSON database. Used when extracting an
@@ -594,7 +607,12 @@ function utils.remove_stack_from_db(database, section, slot, source, nbt)
                 stack.source, stack.slot
             ), DEBUG)
             table.remove(database[section]["stacks"], i)
-        elseif stack.details.nbt == nbt then
+        end
+    end
+
+    -- Check if another item of this type has this NBT.
+    for _,stack in ipairs(database[section]["stacks"]) do
+        if stack.details.nbt == nbt then
             remove_nbt = false
         end
     end

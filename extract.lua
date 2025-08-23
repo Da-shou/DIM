@@ -63,11 +63,18 @@ end
 -- Getting the JSON database as a Lua object
 local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
 if not db then
-    utils.log("Database couldn't be read.", ERROR) 
+    utils.log("Database file was not found.", ERROR)
+    return 
+end
+
+local stats = utils.get_json_file_as_object(config.STATS_FILE_PATH)
+if not stats then
+    utils.log("Stats file was not found.", ERROR)
     return 
 end
 
 local chosen_nbt = nil
+local storage_total = nil
 
 -- Checking if the item sectin has nbt hashes
 if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
@@ -82,7 +89,8 @@ if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
 
     for _,hash in ipairs(nbt_hashes) do
         local nbt_search_results = utils.search_database_for_item(db, INPUT_ID, false, hash)
-        local variant_display_name, _, variant_total, _ = table.unpack(nbt_search_results)
+        local variant_display_name = nbt_search_results.displayName
+        local variant_total = nbt_search_results.total
 
         local w = string.len(variant_display_name)
         if name_w < string.len(variant_display_name) then name_w = w end
@@ -94,7 +102,8 @@ if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
     local default_search_results = utils.search_database_for_item(db, INPUT_ID, false)
 
     if default_search_results then
-        local default_display_name, _, default_total, _ = table.unpack(default_search_results)
+        local default_display_name = default_search_results.displayName
+        local default_total = default_search_results.total
         if default_total > 0 then
             table.insert(nbt_display_data, {default_display_name, "x", default_total, "DEFAULT"})
         end
@@ -105,24 +114,35 @@ if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
         {"<Name>", "<x>", "<Qty>", "<Nbt>"},
         {name_w, 3, 5, 32},
         {false,false,false,false}
-    )[4]
+    )
 
-    utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt), DEBUG)
+    if not chosen_nbt then
+        utils.log("Cancelling extraction.", INFO)
+        if end_program() then return end
+        return
+    end
+
+    storage_total = chosen_nbt[3]
+    utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt[4]), DEBUG)
 end
 
 if chosen_nbt == "DEFAULT" then chosen_nbt = nil end
-local request = utils.search_database_for_item(db, INPUT_ID, false, chosen_nbt)
 
--- Checking if item is in storage and enough items are in storage
-if not request then
-    utils.log("Item could not be found in storage.", WARN)
-    if end_program() then return end
+if not storage_total then
+    local request = utils.search_database_for_item(db, INPUT_ID, false, chosen_nbt)
+
+    -- Checking if item is in storage and enough items are in storage
+    if not request then
+        utils.log("Item could not be found in storage.", WARN)
+        if end_program() then return end
+    end
+
+    storage_total = request.total
 end
 
-local storage_total = request[3]
 local REQUEST_COUNT = nil
 
-utils.log("Results have been found for extraction.", DEBUG)
+utils.log(("%d items ready for extraction."):format(storage_total), DEBUG)
 
 if storage_total > 1 then
     if not INPUT_COUNT or chosen_nbt then
@@ -131,7 +151,6 @@ if storage_total > 1 then
         INPUT_COUNT = read()
         print()
     end
-
 
     if INPUT_COUNT:match("^%d+$") then
         utils.log("Correctly got digit(s) in input.", DEBUG)
@@ -148,7 +167,7 @@ if storage_total > 1 then
         end
     end
 else
-    utils.log(("Only 1 %s found in storage. Extracting..."):format(request[1]), DEBUG)
+    utils.log(("Only 1 %s found in storage. Extracting..."):format(INPUT_ID), DEBUG)
     REQUEST_COUNT = 1
 end
 
@@ -169,8 +188,8 @@ local item_max_stacksize = 1
 
 -- If the details were successfully obtained
 if item_stacks[1] then
-    item_name = item_stacks[1][4]
-    item_max_stacksize = item_stacks[1][8]
+    item_name = item_stacks[1].name
+    item_max_stacksize = item_stacks[1].maxCount
 else
     utils.log("Details about the stacks could not be extracted.", ERROR)
     if end_program() then return end
@@ -214,9 +233,9 @@ local function search_and_extract_stack(item_stacks, count)
     if not count then count = item_max_stacksize end
     -- Finding a stack in storage.
     for j,stack in ipairs(item_stacks) do
-        local stack_source = stack[1]
-        local stack_slot = stack[3]
-        local stack_count = stack[6]
+        local stack_source = stack.source
+        local stack_slot = stack.slot
+        local stack_count = stack.count
 
         -- Trying to find a complete stack first
         utils.log(("Searching for new stack of %d items of %s...")
@@ -230,6 +249,7 @@ local function search_and_extract_stack(item_stacks, count)
                 stack_slot,
                 stack_source
             )
+            stats.used_slots = stats.used_slots - 1
 
             -- Put stack in output inventory
             local inventory = peripheral.wrap(stack_source)
@@ -246,9 +266,9 @@ local function search_and_extract_stack(item_stacks, count)
         -- Reiterate over the stacks to find stacks to combine to make
         -- an entire stack.
         for j,partial_stack in ipairs(item_stacks) do
-            local partial_stack_source = partial_stack[1]
-            local partial_stack_slot = partial_stack[3]
-            local partial_stack_count = partial_stack[6]
+            local partial_stack_source = partial_stack.source
+            local partial_stack_slot = partial_stack.slot
+            local partial_stack_count = partial_stack.count
 
             if nb_needed == 0 then break end
 
@@ -269,6 +289,7 @@ local function search_and_extract_stack(item_stacks, count)
                     partial_stack_slot, 
                     partial_stack_source
                 )
+                stats.used_slots = stats.used_slots - 1
 
                 table.remove(item_stacks, j)
             else
@@ -313,9 +334,9 @@ local function search_and_extract_stack(item_stacks, count)
 
             -- Put stack in output inventory
             utils.log(("Pushing %d items to %s..."):format(count_to_extract, stack_to_extract[1]), DEBUG)
-            local inventory = peripheral.wrap(stack_to_extract[1])
+            local inventory = peripheral.wrap(stack_to_extract.source)
 
-            inventory.pushItems(OUT,stack_to_extract[3],count_to_extract)
+            inventory.pushItems(OUT,stack_to_extract.slot,count_to_extract)
         end
 
         if nb_needed == 0 then break end
@@ -324,7 +345,7 @@ end
 
 --  1. Put stacks in output inventory
 -- Sort results in descending order, so we have full stacks first.
-utils.sort_results_from_db_search(item_stacks, 6, false)
+utils.sort_results_from_db_search(item_stacks, "count", false)
 
 -- Iterating on number of full stacks needed
 if nb_stack_toextract > 0 then
@@ -336,7 +357,7 @@ end
 --  2. Put rest in output inventory
 -- Sorting the stacks left in ascending order to take smallest partial
 -- stacks first to complete rest.
-utils.sort_results_from_db_search(item_stacks, 6)
+utils.sort_results_from_db_search(item_stacks, "count")
 
 utils.log(("Now searching for rest (%d) of %s...")
     :format(nb_rest_toextract, item_name), DEBUG)
@@ -354,10 +375,14 @@ if not db_did_write then
     utils.log(("There was an error during the writing of changes to database."), ERROR)
 end
 
+-- Writing the stats object to a new file.
+local JSON_STATS = textutils.serializeJSON(stats)
+utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
+
 local stop = utils.stop_stopwatch(start)
 
 -- End program
-utils.log(("Executed in %s"):format(stop), TIMER)
+utils.log(("<extract> executed in %s"):format(stop), TIMER)
 -- End program
 utils.log("Extraction program successfully performed extraction.", INFO)
 end_program()

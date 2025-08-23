@@ -17,7 +17,7 @@ local BEGIN = config.LOGTYPE_BEGIN
 local DEBUG = config.LOGTYPE_DEBUG
 local END = config.LOGTYPE_END
 local WARN = config.LOGTYPE_WARNING
-local TIMER = config.TIMER
+local TIMER = config.LOGTYPE_TIMER
 
 utils.reset_terminal()
 
@@ -80,22 +80,25 @@ for _,c in ipairs(candidates) do
         local section_stacks = section["stacks"]
         if table.getn(section_stacks) > 0 then
             local section_nbt = section["nbt"]
-
+            -- If section has NBT values
             if section_nbt and table.getn(section_nbt) > 0 then
+                utils.log(("Found NBT section"), DEBUG)
                 for _,stack in ipairs(section_stacks) do
+                    -- Inserting each stack that has no NBT
                     if not stack.details.nbt then
                         table.insert(display_list, (utils.search_database_for_item(database, c, display_details)))
                         break
                     end
                 end
 
+                -- Inserting all stacks for each NBTs
                 for _,nbt in ipairs(section_nbt) do
-                    utils.log(("Searching item with NBT %s"):format(nbt), DEBUG)
                     table.insert(display_list, (utils.search_database_for_item(database, c, display_details, nbt)))
                 end
             else
-                local default_results = (utils.search_database_for_item(database, c, display_details))
-                if table.getn(default_results) > 0 then
+                utils.log(("No NBT section."), DEBUG)
+                local default_results = utils.search_database_for_item(database, c, display_details)
+                if default_results then
                     table.insert(display_list, default_results)
                 end
             end
@@ -103,22 +106,25 @@ for _,c in ipairs(candidates) do
     end
 end
 
+local stop = utils.stop_stopwatch(start)
+
+local choice = nil
+
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
     local best = 0
 
     -- Finding optimal width size for name column.
-    for i, row in ipairs(display_list) do
+    for _, row in ipairs(display_list) do
         local w = 0
-        
         -- Finding the longest name or display name, depending on
         -- the state of display_details
         if display_details then
             for _,line in ipairs(row) do
-                w = string.len(line[4])
+                w = string.len(line.name)
             end
         else
-            w = string.len(row[1])
+            w = string.len(row.displayName)
         end
 
         -- Updating maximum
@@ -138,59 +144,68 @@ if table.getn(display_list) > 0 then
     end
 
     if best > config.MAX_DISPLAY_NAME_LENGTH then best = config.MAX_DISPLAY_NAME_LENGTH end
+    local string_rows = {}
 
     -- Beginning to print the results of the search
     if display_details then
-        local detailed_rows = {}
-
         -- Extract lines from the groups returned by search_database_for_item
         for i,group in ipairs(display_list) do
             for _,line in ipairs(group) do
                 -- Removing the first part of the id to only get the name and
                 -- id of storage.
-                line[1] = line[1]:match(":(.*)") or line[1]
+                line.source = line.source:match(":(.*)") or line.source
 
-                table.insert(line,1,i)
-
-                -- Getting rid of maxcount
-                table.remove(line,9)
-                -- Getting rid of displayName
-                table.remove(line,9)
-
-                table.insert(detailed_rows, line)
+                table.insert(string_rows,{
+                    i,
+                    line.source,
+                    line.at,
+                    line.slot,
+                    line.name,
+                    line.x,
+                    line.count,
+                    line.nbt
+                })
             end
         end
 
         -- Print detailed display
         utils.paged_tabulate_fixed(
-            detailed_rows,
+            string_rows,
             {"<#>","<Storage>", "@", "<s>", "<ID>", "x", "<Qty>", "<Nbt>"}, 
             {3,11,1,3,best,1,5,32},
-            {false,true,false,false,false,false,false,false}
+            {false,false,false,false,false,false,false,false}
         )
     else
         -- Sort results by quantity if search all
         if search_all then 
-            utils.sort_results_from_db_search(display_list, 3, false)
+            utils.sort_results_from_db_search(display_list, "total", false)
         end
 
-        for i,row in ipairs(display_list) do
-            table.insert(row, 1, i)
+        for i,item in ipairs(display_list) do
+            table.insert(string_rows,{
+                i,
+                item.displayName,
+                item.x,
+                item.total,
+                item.name
+            })
         end
     
-        utils.paged_tabulate_fixed(
-            display_list, 
-            {"<#>", "<Name>", "x", "<Qty>", "<Stk>"}, 
-            {4,best,1,6,5},
-            {false,false,false}
+        choice = utils.paged_tabulate_fixed_choice(
+            string_rows, 
+            {"<#>", "<Name>", "x", "<Qty>", "<ID>"}, 
+            {4,best,1,6,40},
+            {false,false,false,false}
         )
     end
 else
     utils.log(("No results have been found for your search query <%s>"):format(search_query), INFO)
 end
 
-local stop = utils.stop_stopwatch(start)
+if choice then
+    shell.run("extract", choice[5])
+end
 
 -- End program
-utils.log(("Executed in %s"):format(stop), TIMER)
+utils.log(("<search> executed in %s"):format(stop), TIMER)
 utils.log(("Search program ended.\n"):format(search_query), END)

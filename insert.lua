@@ -101,11 +101,11 @@ function find_available_slot(database, item_name, max_stack_size, quantity, nbt)
 
             -- Iterating in the results
             for _,stack in ipairs(partial_stacks_search) do
-                stack_source = stack[1]
-                stack_slot = stack[3]
-                stack_name = stack[4]
-                stack_count = stack[6]
-                stack_nbt = stack[7]
+                stack_source = stack.source
+                stack_slot = stack.slot
+                stack_name = stack.name
+                stack_count = stack.count
+                stack_nbt = stack.nbt
 
                 if stack_name == item_name and stack_count < max_stack_size then
                     if nbt and stack_nbt ~= nbt then
@@ -133,7 +133,7 @@ function find_available_slot(database, item_name, max_stack_size, quantity, nbt)
 
     if table.getn(empty_slots_search) > 0 then
         utils.log("Found empty slot.", DEBUG)
-        return {empty_slots_search[1][3], empty_slots_search[1][1], nil}
+        return {empty_slots_search[1].slot, empty_slots_search[1].source, nil}
     end
 
     -- If no empty slots nor partial slots were found in the
@@ -158,7 +158,16 @@ local progress = 0
 local input_stack_index = 0
 
 local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
-if not db then return end
+if not db then
+    utils.log("Database file could not be found.", ERROR) 
+    return 
+end
+
+local stats = utils.get_json_file_as_object(config.STATS_FILE_PATH)
+if not stats then 
+    utils.log("Statistics file could not be found.", ERROR)
+    return 
+end
 
 -- Iterating over the items in the input storage. This is done first
 -- so that each item can see the full storage and find the optimal
@@ -277,6 +286,7 @@ for input_slot, input_stack in pairs(input_stacks) do
                     output_name, 
                     stack_details
                 )
+                stats.used_slots = stats.used_slots + 1
             end
         end
 
@@ -330,9 +340,13 @@ if not db_did_save then
     return
 end
 
+-- Writing the stats object to a new file.
+local JSON_STATS = textutils.serializeJSON(stats)
+utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
+
 local stop = utils.stop_stopwatch(start)
 
 -- End program
-utils.log(("Executed in %s"):format(stop), TIMER)
+utils.log(("<insert> executed in %s"):format(stop), TIMER)
 -- End the program
 utils.log("Insertion ended successfully.", END)
