@@ -133,10 +133,10 @@ if not chosen_nbt then
         end
 
         storage_total = chosen_nbt[3]
+        if chosen_nbt then utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt[4]), DEBUG) end
     end
 end
 
-if chosen_nbt then utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt[4]), DEBUG) end
 if chosen_nbt == "DEFAULT" then chosen_nbt = nil end
 
 if not storage_total then
@@ -367,6 +367,9 @@ local JSON_STATS = textutils.serializeJSON(stats)
 utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
 
 local stop = utils.stop_stopwatch(start)
+
+utils.log(("%d empty slots left."):format(stats.total_slots-stats.used_slots), INFO)
+utils.log(("%.1f%% of empty slots used."):format((stats.used_slots/stats.total_slots)*100), INFO)
 
 -- End program
 utils.log(("<extract> executed in %s"):format(stop), TIMER)

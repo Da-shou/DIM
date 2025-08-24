@@ -348,6 +348,9 @@ utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
 
 local stop = utils.stop_stopwatch(start)
 
+utils.log(("%d empty slots left."):format(stats.total_slots-stats.used_slots), INFO)
+utils.log(("%.1f%% of empty slots used."):format((stats.used_slots/stats.total_slots)*100), INFO)
+
 -- End program
 utils.log(("<insert> executed in %s"):format(stop), TIMER)
 -- End the program

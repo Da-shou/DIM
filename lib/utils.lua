@@ -43,7 +43,7 @@ function utils.log(content, type)
         printError(log_pattern:
             format(os.getComputerID(),utils.get_local_time(),type,content))
     elseif type ~= config.LOGTYPE_DEBUG or (type == config.LOGTYPE_DEBUG and config.SHOW_DEBUG) then
-        textutils.pagedPrint(log_pattern:
+        print(log_pattern:
             format(os.getComputerID(),utils.get_local_time(),type,content))
     end
 end
@@ -347,11 +347,14 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
             end
         end
 
-        local y_limit = utils.fif(
-            current_page == nb_page_needed,
-            table.getn(data) % h_space_rows,
-            h_space_rows
-        )
+
+        local y_limit = h_space_rows
+
+        if current_page == nb_page_needed then
+            if table.getn(data) % h_space_rows > 0 then
+                y_limit = table.getn(data) % h_space_rows
+            end
+        end
 
         -- Changing page if we hit bottom or top.
         if cursor_pos > y_limit then
@@ -369,7 +372,11 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
             if current_page == 1 then
                 -- If first page, go to last page.
                 current_page = nb_page_needed
-                cursor_pos = table.getn(data) % h_space_rows
+                if table.getn(data) % h_space_rows > 0 then
+                    cursor_pos = table.getn(data) % h_space_rows
+                else
+                    cursor_pos = h_space_rows
+                end
             elseif current_page > 1 then
                 -- If not, go to previous
                 current_page = current_page - 1
@@ -425,7 +432,6 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
 
         -- If this was the last page, leave
         if (current_page == nb_page_needed) then 
-            -- Prompt the user to hit a key before showing next page.
             utils.log(("End of list reached."), config.LOGTYPE_INFO)
         end
 
