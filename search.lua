@@ -33,7 +33,7 @@ local display_details = false
 local usage = "usage : search <query[string]> <display_details[bool]>"
 
 if arg[1] == nil or arg[1] == "" then
-    utils.log("Search query is empty!", ERROR)
+    utils.log("Search query is empty!", WARN)
     utils.log(usage, INFO)
     return
 end
@@ -212,12 +212,11 @@ if choice then
 
     shell.run(("details %s %s"):format(choice_id, choice_nbt))
 
-    local eventData = {os.pullEventRaw()}
-    local event = eventData[1]
+    local eventData = {os.pullEvent()}
     
-    if event == "char" and eventData[2] == "x" then
+    if eventData[1] == "print_list" and eventData[2] == "print_list" then
         goto print_results
-    else end
+    end
 end
 
 -- End program

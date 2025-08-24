@@ -109,23 +109,84 @@ if enchantments then
 end
 
 print()
-utils.log("Press <ENTER> to extract item. Press <X> to return.", INFO)
+utils.log("Select option with <LEFT>, <RIGHT>. Confirm with <ENTER>.", INFO)
+print()
+print()
+
+local choice = 1
+local x,_ = term.getSize()
+local _,y = term.getCursorPos()
+
+local function switchTo(bgColor, textColor) 
+    term.setTextColor(textColor)
+    term.setBackgroundColor(bgColor)
+end
 
 while true do
+    term.setCursorPos(1,y-1)
+    term.clearLine()
+    term.setCursorPos(1,y)
+    term.clearLine()
+    term.setCursorPos(1,y+1)
+    term.clearLine()
+    
+    -- how many chars inbetween options
+    local spacing = 10
+    local e = "EXTRACT"
+    local r = "RETURN"
+
+    local middle_pos = math.floor(x/2)
+    local start_e = middle_pos - (string.len(e) + math.floor(string.len(e)/2)) - spacing
+    local start_r = middle_pos + (string.len(r) + math.floor(string.len(r)/2)) + spacing
+    
+    if choice == 1 then
+        switchTo(colours.red, colours.black)
+        term.setCursorPos(start_e-1, y-1)
+        write(string.rep(" ",string.len(e)+2))
+        term.setCursorPos(start_e-1, y)
+        write("<"..e..">")
+        term.setCursorPos(start_e-1, y+1)
+        write(string.rep(" ",string.len(e)+2))
+        term.setCursorPos(start_r, y)
+        switchTo(colours.black, colours.white)
+        write(r)
+    else
+        term.setCursorPos(start_e, y)
+        switchTo(colours.black, colours.white)
+        write(e)
+        switchTo(colours.red, colours.black)
+        term.setCursorPos(start_r-1, y-1)
+        write(string.rep(" ",string.len(r)+2))
+        term.setCursorPos(start_r-1, y)
+        write("<"..r..">")
+        term.setCursorPos(start_r-1, y+1)
+        write(string.rep(" ",string.len(r)+2))
+        switchTo(colours.black, colours.white)
+    end
+
     local _, key, _ = os.pullEvent("key")
-    if keys.getName(key) == "enter" then
-        if ITEM_NBT == nil then ITEM_NBT = "DEFAULT" end
-        shell.run(("extract %s %s %s"):format(ITEM_ID, "nil", ITEM_NBT))
-        os.queueEvent("quit", "quit")
+    local pressed = keys.getName(key)
+
+    if pressed == "left" then
+        choice = utils.fif(choice == 1, 2, 1)
+    elseif pressed == "right" then
+        choice = utils.fif(choice == 2, 1, 2)
+    elseif pressed == "enter" then
+        if choice == 1 then
+            if ITEM_NBT == nil then ITEM_NBT = "DEFAULT" end
+            shell.run(("extract %s %s %s"):format(ITEM_ID, "nil", ITEM_NBT))
+            os.queueEvent("quit", "quit")
+            break
+        else
+        os.queueEvent("print_list", "print_list")
         break
-    elseif keys.getName(key) == "x" then
-        break
-    else end
+        end
+    end
 end
 
 print()
 -- End program
 utils.log(("<details> executed in %s"):format(stop), TIMER)
 -- End program
-utils.log("Details program successfully performed extraction.", INFO)
+utils.log("Details program ending.", INFO)
 end_program()
