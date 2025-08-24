@@ -109,7 +109,9 @@ end
 local stop = utils.stop_stopwatch(start)
 
 local choice = nil
-local choice_nbt = nil
+
+
+::print_results::
 
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
@@ -204,9 +206,18 @@ else
 end
 
 if choice then
+    local choice_id = choice[5]
     local choice_index = tonumber(choice[1])
     local choice_nbt = display_list[choice_index].nbt
-    shell.run(("extract %s %s %s"):format(choice[5], "nil", choice_nbt))
+
+    shell.run(("details %s %s"):format(choice_id, choice_nbt))
+
+    local eventData = {os.pullEventRaw()}
+    local event = eventData[1]
+    
+    if event == "char" and eventData[2] == "x" then
+        goto print_results
+    else end
 end
 
 -- End program

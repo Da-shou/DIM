@@ -42,7 +42,6 @@ end
 
 local function end_program()
     utils.log("Ending extraction program.",END)
-    print()
     return true
 end
 
@@ -124,7 +123,7 @@ if not chosen_nbt then
             {"<Name>", "<x>", "<Qty>", "<Nbt>"},
             {name_w, 3, 5, 32},
             {false,false,false,false}
-        )
+        )[4]
 
         if not chosen_nbt then
             utils.log("Cancelling extraction.", INFO)
@@ -133,7 +132,6 @@ if not chosen_nbt then
         end
 
         storage_total = chosen_nbt[3]
-        if chosen_nbt then utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt[4]), DEBUG) end
     end
 end
 
@@ -154,7 +152,6 @@ end
 local REQUEST_COUNT = nil
 
 utils.log(("%d items ready for extraction."):format(storage_total), DEBUG)
-
 
 if storage_total > 1 then
     if INPUT_COUNT == nil or chosen_nbt then
@@ -372,7 +369,9 @@ utils.log(("%d empty slots left."):format(stats.total_slots-stats.used_slots), I
 utils.log(("%.1f%% of empty slots used."):format((stats.used_slots/stats.total_slots)*100), INFO)
 
 -- End program
+print()
 utils.log(("<extract> executed in %s"):format(stop), TIMER)
 -- End program
 utils.log("Extraction program successfully performed extraction.", INFO)
+
 end_program()
