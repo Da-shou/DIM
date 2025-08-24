@@ -43,7 +43,7 @@ function utils.log(content, type)
         printError(log_pattern:
             format(os.getComputerID(),utils.get_local_time(),type,content))
     elseif type ~= config.LOGTYPE_DEBUG or (type == config.LOGTYPE_DEBUG and config.SHOW_DEBUG) then
-        print(log_pattern:
+        textutils.pagedPrint(log_pattern:
             format(os.getComputerID(),utils.get_local_time(),type,content))
     end
 end

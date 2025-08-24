@@ -243,40 +243,7 @@ end
 
 local function search_and_extract_stack(item_stacks, count)
     if not count then count = item_max_stacksize end
-
-    -- Trying to find a complete stack first
-    utils.log(("Finding stack of exactly %d items of %s...")
-        :format(count, item_name), DEBUG)
-
-    -- Finding a full stack in storage.
-    for j,stack in ipairs(item_stacks) do
-        local stack_source = stack.source
-        local stack_slot = stack.slot
-        local stack_count = stack.count
-        local stack_nbt = stack.nbt
-
-
-        if stack_count == count then
-            -- Remove stack from database
-            utils.remove_stack_from_db(
-                db,
-                item_name,
-                stack_slot,
-                stack_source,
-                stack_nbt
-            )
-            stats.used_slots = stats.used_slots - 1
-
-            -- Put stack in output inventory
-            local inventory = peripheral.wrap(stack_source)
-            inventory.pushItems(OUT, stack_slot, count)
-            table.remove(item_stacks, j)
-            return
-        end
-    end
-
-    utils.log(("Did not find any stacks of exactly %d %s."):format(count, item_name), DEBUG)
-    utils.log(("Starting partial search."), DEBUG)
+    utils.log(("Searching for %d x %s."):format(count, item_name), DEBUG)
 
     local nb_needed = count
     local stacks_to_extract = {}
@@ -289,17 +256,14 @@ local function search_and_extract_stack(item_stacks, count)
         local partial_stack_count = partial_stack.count
         local partial_stack_nbt = partial_stack.nbt
         
-        if nb_needed == 0 then
-            utils.log("All partial stacks needed have been found!", DEBUG)
-            break 
-        end
+        if nb_needed == 0 then break end
         
         utils.log(("Still need %d items."):format(nb_needed), DEBUG)
         if partial_stack_count <= nb_needed then
             -- If we found a stack whose entire count is under our
             -- needs, add it to the list and decrease the needed count.
 
-            utils.log(([[Found stack in with n.e./j.e items (%d) to satisfy need (%d).]])
+            utils.log(([[Found stack with n.e/j.e (%d) to satisfy need (%d).]])
                 :format(partial_stack_count, nb_needed), DEBUG)
 
             nb_needed = nb_needed - partial_stack_count
