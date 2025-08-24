@@ -9,8 +9,8 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 |✔|Send items into the network through an input storage inventory.
 |✔|Search (quickly !) for items in the network, including unique items (Potions, named items, etc..).
 |✔|Extract items from the network to an output storage inventory.
-|**WIP**|Find a nice way for the user to extract unique items.
-|❌|See miscelleanous storage statistics.
+|✔|Find a nice way for the user to extract unique items.
+|**WIP**|See miscelleanous storage statistics.
 |❌|Make a user-friendly interface.
 
 ### ⚙ Secondary goals
