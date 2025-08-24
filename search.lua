@@ -7,7 +7,7 @@
 -- Usage : search <query[string]> <display_details[true|false]
 
 -- Created : 17/08/2025
--- Updated : 19/08/2025
+-- Updated : 24/08/2025
 
 local config = require("lib/config")
 local utils = require("lib/utils")
@@ -109,6 +109,7 @@ end
 local stop = utils.stop_stopwatch(start)
 
 local choice = nil
+local choice_nbt = nil
 
 -- Choose what to display based on the state of the display_details boolean.
 if table.getn(display_list) > 0 then
@@ -194,7 +195,7 @@ if table.getn(display_list) > 0 then
         choice = utils.paged_tabulate_fixed_choice(
             string_rows, 
             {"<#>", "<Name>", "x", "<Qty>", "<ID>"}, 
-            {4,best,1,6,40},
+            {4,best,1,6,30},    
             {false,false,false,false}
         )
     end
@@ -203,7 +204,9 @@ else
 end
 
 if choice then
-    shell.run("extract", choice[5])
+    local choice_index = tonumber(choice[1])
+    local choice_nbt = display_list[choice_index].nbt
+    shell.run(("extract %s %s %s"):format(choice[5], "nil", choice_nbt))
 end
 
 -- End program

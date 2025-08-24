@@ -7,7 +7,7 @@
 -- network.
 
 -- Created : 18/08/2025
--- Updated : 18/08/2025
+-- Updated : 24/08/2025
 
 -- Getting libraries
 local utils = require("lib/utils")
@@ -216,8 +216,10 @@ for input_slot, input_stack in pairs(input_stacks) do
             
         -- Get the number of items inserted
         if nb_to_insert then
+            local local_nb_inserted = math.min(nb_to_insert, stack_details.count)
+
             utils.log(("Pushing %d x <%s> in partial slot %d @ %s"):format(
-                nb_to_insert, stack_details.displayName, output_slot, output_name
+                local_nb_inserted, stack_details.displayName, output_slot, output_name
             ), DEBUG)
             partial_insert = true
 
@@ -294,7 +296,7 @@ for input_slot, input_stack in pairs(input_stacks) do
             -- If only a fraction of the input stack was
             -- because of completion of another stack,
             -- start search for the same slot again.
-            utils.log("Fraction of stack was put in storage. Starting search again to find space for rest of the stack.", DEBUG)
+            utils.log("Fraction of stack was put in storage. Starting search again.", DEBUG)
             goto search
         end
     end

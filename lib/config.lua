@@ -6,7 +6,7 @@
 -- that are shared between the files.
 
 -- Created : 17/08/2025
--- Updated : 19/08/2025
+-- Updated : 24/08/2025
 
 local config = {}
 
@@ -30,7 +30,7 @@ config.REG_PATHS = {
 }
 
 -- Will show the logs marked as "DEBUG"
-config.SHOW_DEBUG = false
+config.SHOW_DEBUG = true
 
 -- The type of inventory to scan for
 config.STORAGE_TYPE = "minecraft:barrel"

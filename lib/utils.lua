@@ -300,7 +300,7 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
     local h_space = h-5
 
     -- Space for rows only.
-    local h_space_rows = h_space-3
+    local h_space_rows = h_space-5
     local current_page_rows = {}
 
     -- Calculate number of pages needed
@@ -471,14 +471,16 @@ function utils.search_database_for_item(database, name, by_stack, nbt, partial_o
         local item_type_stacks = item_type["stacks"]
         local total = 0
         local stack_max_size = 1
+        local stack_nbt = nil
 
         -- If nbt == nil, will insert all stacks without NBTs.
         -- If nbt has a value, will insert all stacks with hash = nbt
         for _,stack in ipairs(item_type_stacks) do
-            display_name = stack.details.displayName
-            total = total + stack.details.count
-            stack_max_size = stack.details.maxCount
             if stack.details.nbt == nbt then
+                display_name = stack.details.displayName
+                total = total + stack.details.count
+                stack_max_size = stack.details.maxCount
+                stack_nbt = stack.details.nbt
                 if by_stack then
                     if not partial_only or (partial_only and stack.details.count < stack.details.maxCount) then
                         table.insert(detailed_results,{
@@ -498,16 +500,15 @@ function utils.search_database_for_item(database, name, by_stack, nbt, partial_o
         end
 
         if not by_stack then
-            utils.log(("Returning simple infos about %s..."):format(name), DEBUG)
             return {
                 displayName=display_name, 
                 x="x", 
                 total=total, 
                 stackMaxSize=stack_max_size,
-                name=name
+                name=name,
+                nbt=stack_nbt
             }
         else
-            utils.log(("Returning detailed infos about %s..."):format(name), DEBUG)
             return detailed_results
         end
     end
@@ -620,6 +621,7 @@ function utils.remove_stack_from_db(database, section, slot, source, nbt)
     -- If the stack removed was the last having this NBT,
     -- remove it from the NBT list.
     if remove_nbt then
+        utils.log("Last item with this NBT found. Removing NBT from database.", DEBUG)
         for i,hash in ipairs(database[section]["nbt"]) do
             if hash == nbt then
                 table.remove(database[section]["nbt"], i)

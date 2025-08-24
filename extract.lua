@@ -7,7 +7,7 @@
 -- Usage : extract <item_id[string]> <count[number]>
 
 -- Created : 19/08/2025
--- Updated : 19/08/2025
+-- Updated : 24/08/2025
 
 local config = require("lib/config")
 local utils = require("lib/utils")
@@ -30,7 +30,15 @@ local choices = utils.prepare_registries()
 local function input_completer (text) return completion.choice(text, choices) end
 
 local INPUT_ID = arg[1]
-local INPUT_COUNT = arg[2]
+local INPUT_COUNT = nil
+local INPUT_NBT = nil
+
+if table.getn(arg) == 3 then
+    INPUT_COUNT = nil
+    INPUT_NBT = arg[3]
+elseif table.getn(arg) == 2 then
+    INPUT_COUNT = arg[2]
+end
 
 local function end_program()
     utils.log("Ending extraction program.",END)
@@ -74,58 +82,61 @@ if not stats then
 end
 
 local chosen_nbt = nil
+if INPUT_NBT ~= "nil" then chosen_nbt = INPUT_NBT end
 local storage_total = nil
 
--- Checking if the item sectin has nbt hashes
-if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
-    utils.log("Item requested has NBT hashes.", DEBUG)
+if not chosen_nbt then
+    -- Checking if the item section has nbt hashes
+    if db[INPUT_ID] and table.getn(db[INPUT_ID]["nbt"]) > 0 then
+        utils.log("Item requested has NBT hashes.", DEBUG)
 
-    -- Getting all NBT hashes
-    local nbt_hashes = db[INPUT_ID]["nbt"]
+        -- Getting all NBT hashes
+        local nbt_hashes = db[INPUT_ID]["nbt"]
 
-    -- Prepare table to show to user
-    local nbt_display_data = {}
-    local name_w = 0
+        -- Prepare table to show to user
+        local nbt_display_data = {}
+        local name_w = 0
 
-    for _,hash in ipairs(nbt_hashes) do
-        local nbt_search_results = utils.search_database_for_item(db, INPUT_ID, false, hash)
-        local variant_display_name = nbt_search_results.displayName
-        local variant_total = nbt_search_results.total
+        for _,hash in ipairs(nbt_hashes) do
+            local nbt_search_results = utils.search_database_for_item(db, INPUT_ID, false, hash)
+            local variant_display_name = nbt_search_results.displayName
+            local variant_total = nbt_search_results.total
 
-        local w = string.len(variant_display_name)
-        if name_w < string.len(variant_display_name) then name_w = w end
+            local w = string.len(variant_display_name)
+            if name_w < string.len(variant_display_name) then name_w = w end
 
-        table.insert(nbt_display_data, {variant_display_name, "x", variant_total, hash})
-    end
-
-    -- Checking if there are items without NBT as well.
-    local default_search_results = utils.search_database_for_item(db, INPUT_ID, false)
-
-    if default_search_results then
-        local default_display_name = default_search_results.displayName
-        local default_total = default_search_results.total
-        if default_total > 0 then
-            table.insert(nbt_display_data, {default_display_name, "x", default_total, "DEFAULT"})
+            table.insert(nbt_display_data, {variant_display_name, "x", variant_total, hash})
         end
+
+        -- Checking if there are items without NBT as well.
+        local default_search_results = utils.search_database_for_item(db, INPUT_ID, false)
+
+        if default_search_results then
+            local default_display_name = default_search_results.displayName
+            local default_total = default_search_results.total
+            if default_total > 0 then
+                table.insert(nbt_display_data, {default_display_name, "x", default_total, "DEFAULT"})
+            end
+        end
+
+        chosen_nbt = utils.paged_tabulate_fixed_choice(
+            nbt_display_data,
+            {"<Name>", "<x>", "<Qty>", "<Nbt>"},
+            {name_w, 3, 5, 32},
+            {false,false,false,false}
+        )
+
+        if not chosen_nbt then
+            utils.log("Cancelling extraction.", INFO)
+            if end_program() then return end
+            return
+        end
+
+        storage_total = chosen_nbt[3]
     end
-
-    chosen_nbt = utils.paged_tabulate_fixed_choice(
-        nbt_display_data,
-        {"<Name>", "<x>", "<Qty>", "<Nbt>"},
-        {name_w, 3, 5, 32},
-        {false,false,false,false}
-    )
-
-    if not chosen_nbt then
-        utils.log("Cancelling extraction.", INFO)
-        if end_program() then return end
-        return
-    end
-
-    storage_total = chosen_nbt[3]
-    utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt[4]), DEBUG)
 end
 
+if chosen_nbt then utils.log(("User chose NBT Hash <%s>"):format(chosen_nbt[4]), DEBUG) end
 if chosen_nbt == "DEFAULT" then chosen_nbt = nil end
 
 if not storage_total then
@@ -144,8 +155,9 @@ local REQUEST_COUNT = nil
 
 utils.log(("%d items ready for extraction."):format(storage_total), DEBUG)
 
+
 if storage_total > 1 then
-    if not INPUT_COUNT or chosen_nbt then
+    if INPUT_COUNT == nil or chosen_nbt then
         utils.log(("Please enter the amount wanted (%d in storage)\n"):format(storage_total), INFO)
         write("> ")
         INPUT_COUNT = read()
@@ -231,23 +243,27 @@ end
 
 local function search_and_extract_stack(item_stacks, count)
     if not count then count = item_max_stacksize end
-    -- Finding a stack in storage.
+
+    -- Trying to find a complete stack first
+    utils.log(("Finding stack of exactly %d items of %s...")
+        :format(count, item_name), DEBUG)
+
+    -- Finding a full stack in storage.
     for j,stack in ipairs(item_stacks) do
         local stack_source = stack.source
         local stack_slot = stack.slot
         local stack_count = stack.count
+        local stack_nbt = stack.nbt
 
-        -- Trying to find a complete stack first
-        utils.log(("Searching for new stack of %d items of %s...")
-            :format(count, item_name), DEBUG)
 
-        if stack_count == item_max_stacksize then
+        if stack_count == count then
             -- Remove stack from database
             utils.remove_stack_from_db(
                 db,
                 item_name,
                 stack_slot,
-                stack_source
+                stack_source,
+                stack_nbt
             )
             stats.used_slots = stats.used_slots - 1
 
@@ -255,91 +271,98 @@ local function search_and_extract_stack(item_stacks, count)
             local inventory = peripheral.wrap(stack_source)
             inventory.pushItems(OUT, stack_slot, count)
             table.remove(item_stacks, j)
-            break
+            return
         end
+    end
 
-        utils.log(("Did not find any complete stacks."), DEBUG)
+    utils.log(("Did not find any stacks of exactly %d %s."):format(count, item_name), DEBUG)
+    utils.log(("Starting partial search."), DEBUG)
 
-        local nb_needed = count
-        local stacks_to_extract = {}
+    local nb_needed = count
+    local stacks_to_extract = {}
 
-        -- Reiterate over the stacks to find stacks to combine to make
-        -- an entire stack.
-        for j,partial_stack in ipairs(item_stacks) do
-            local partial_stack_source = partial_stack.source
-            local partial_stack_slot = partial_stack.slot
-            local partial_stack_count = partial_stack.count
-
-            if nb_needed == 0 then break end
-
-            if partial_stack_count <= nb_needed then
-                -- If we found a stack whose entire count is under our
-                -- needs, add it to the list and decrease the needed count.
-
-                utils.log(([[Found stack in with not enough/just enough items (%d) to satisfy need (%d).]])
-                    :format(partial_stack_count, nb_needed), DEBUG)
-
-                nb_needed = nb_needed - partial_stack_count
-                table.insert(stacks_to_extract, {partial_stack, partial_stack_count})
-                
-                -- Removing the stack from the lua database object
-                utils.remove_stack_from_db(
-                    db,
-                    item_name,
-                    partial_stack_slot, 
-                    partial_stack_source
-                )
-                stats.used_slots = stats.used_slots - 1
-
-                table.remove(item_stacks, j)
-            else
-                -- We found a stack whose entire count is above our
-                -- needs, so just substract our needed amount from the
-                -- stack and update it in the database.
-
-                utils.log(([[Found stack with too many items (%d) to satisfy need (%d).]])
-                    :format(partial_stack_count, nb_needed), DEBUG)
-                    
-                local new_stack_count = partial_stack_count - nb_needed
-                table.insert(stacks_to_extract, {partial_stack, nb_needed})
-
-                -- Updating the stack in the lua database object
-                utils.update_stack_count_in_db(
-                    db,
-                    item_name,
-                    partial_stack_slot,
-                    partial_stack_source,
-                    new_stack_count
-                )
-                
-                -- So that the rest finding loop doesn't iterate over false data.
-                partial_stack[6] = new_stack_count
-                nb_needed = 0
-            end
+    -- Reiterate over the stacks to find stacks to combine to make
+    -- an entire stack.
+    for j,partial_stack in ipairs(item_stacks) do
+        local partial_stack_source = partial_stack.source
+        local partial_stack_slot = partial_stack.slot
+        local partial_stack_count = partial_stack.count
+        local partial_stack_nbt = partial_stack.nbt
+        
+        if nb_needed == 0 then
+            utils.log("All partial stacks needed have been found!", DEBUG)
+            break 
         end
         
-        local subtotal = 0
-        -- Extract all partial stacks of items from storage
-        -- to make up the stack.
-        for j,data in ipairs(stacks_to_extract) do
-            local stack_to_extract, count_to_extract = table.unpack(data)
+        utils.log(("Still need %d items."):format(nb_needed), DEBUG)
+        if partial_stack_count <= nb_needed then
+            -- If we found a stack whose entire count is under our
+            -- needs, add it to the list and decrease the needed count.
 
-            subtotal = subtotal + count_to_extract
+            utils.log(([[Found stack in with n.e./j.e items (%d) to satisfy need (%d).]])
+                :format(partial_stack_count, nb_needed), DEBUG)
 
-            utils.log(([[Extracting partial stack %d (%d) to make a stack...]])
-                    :format(j, count_to_extract), DEBUG)
+            nb_needed = nb_needed - partial_stack_count
+            table.insert(stacks_to_extract, {partial_stack, partial_stack_count})
+            
+            -- Removing the stack from the lua database object
+            utils.remove_stack_from_db(
+                db,
+                item_name,
+                partial_stack_slot, 
+                partial_stack_source,
+                partial_stack_nbt
+            )
 
-            utils.log(([[Progression : (%d/%d)]])
-            :format(subtotal, count), DEBUG)
+            stats.used_slots = stats.used_slots - 1
 
-            -- Put stack in output inventory
-            utils.log(("Pushing %d items to %s..."):format(count_to_extract, stack_to_extract[1]), DEBUG)
-            local inventory = peripheral.wrap(stack_to_extract.source)
+            table.remove(item_stacks, j)
+        else
+            -- We found a stack whose entire count is above our
+            -- needs, so just substract our needed amount from the
+            -- stack and update it in the database.
 
-            inventory.pushItems(OUT,stack_to_extract.slot,count_to_extract)
+            utils.log(([[Found stack with too many items (%d) to satisfy need (%d).]])
+                :format(partial_stack_count, nb_needed), DEBUG)
+                
+            local new_stack_count = partial_stack_count - nb_needed
+            table.insert(stacks_to_extract, {partial_stack, nb_needed})
+
+            -- Updating the stack in the lua database object
+            utils.update_stack_count_in_db(
+                db,
+                item_name,
+                partial_stack_slot,
+                partial_stack_source,
+                new_stack_count
+            )
+            
+            -- So that the rest finding loop doesn't iterate over false data.
+            partial_stack.count = new_stack_count
+            nb_needed = 0
         end
+    end
 
-        if nb_needed == 0 then break end
+    local subtotal = 0
+
+    -- Extract all partial stacks of items from storage
+    -- to make up the stack.
+    for j,data in ipairs(stacks_to_extract) do
+        local stack_to_extract, count_to_extract = table.unpack(data)
+
+        subtotal = subtotal + count_to_extract
+
+        utils.log(([[Extracting partial stack %d (%d)]])
+                :format(j, count_to_extract), DEBUG)
+
+        utils.log(([[Progression : (%d/%d)]])
+        :format(subtotal, count), DEBUG)
+
+        -- Put stack in output inventory
+        utils.log(("Pushing %d items to %s..."):format(count_to_extract, stack_to_extract.source), DEBUG)
+        local inventory = peripheral.wrap(stack_to_extract.source)
+
+        inventory.pushItems(OUT,stack_to_extract.slot,count_to_extract)
     end
 end
 
