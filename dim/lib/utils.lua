@@ -6,11 +6,12 @@
 -- different projects files. This is not a file to be touched by
 -- the user.
 
-local config = require("lib/config")
+local constants = require("lib/constants")
 
-local ERROR = config.LOGTYPE_ERROR
-local INFO = config.LOGTYPE_INFO
-local DEBUG = config.LOGTYPE_DEBUG
+
+local ERROR = constants.LOGTYPE_ERROR
+local INFO = constants.LOGTYPE_INFO
+local DEBUG = constants.LOGTYPE_DEBUG
 
 local utils = {}
 
@@ -21,10 +22,132 @@ function utils.fif(condition, if_true, if_false)
   if condition then return if_true else return if_false end
 end
 
+function utils.print_centered(text, bg_colour, text_colour)
+    local cur_bg_colour = term.getBackgroundColour()
+    local cur_text_colour = term.getTextColour()
+
+    if bg_colour == nil then bg_colour = term.getBackgroundColour() end
+    if text_colour == nil then text_colour = term.getTextColour() end
+    
+    local max_x, _ = term.getSize()
+    local _, current_y = term.getCursorPos()
+    local x_mid = math.floor(max_x/2)
+    local x_start = x_mid - math.floor(string.len(text)/2)
+    term.setCursorPos(x_start, current_y)
+    term.setBackgroundColor(bg_colour)
+    term.setTextColor(text_colour)
+    print(text)
+    term.setBackgroundColor(cur_bg_colour)
+    term.setTextColor(cur_text_colour)
+end
+
+function utils.print_align_left(text, bg_colour, text_colour, margin)
+    local cur_bg_colour = term.getBackgroundColour()
+    local cur_text_colour = term.getTextColour()
+
+    if not bg_colour then bg_colour = term.getBackgroundColour() end
+    if not text_colour then text_colour = term.getTextColour() end
+    
+    local max_x, _ = term.getSize()
+    local _, current_y = term.getCursorPos()
+
+    if not margin then margin = math.floor(max_x/6) end
+    local x_start = margin
+
+    term.setCursorPos(x_start, current_y)
+    term.setBackgroundColor(bg_colour)
+    term.setTextColor(text_colour)
+    print(text)
+    term.setBackgroundColor(cur_bg_colour)
+    term.setTextColor(cur_text_colour)
+end
+
 -- Clears terminal and sets cursor pos to 1,1
-function utils.reset_terminal()
+function utils.reset_terminal(bg_colour, text_colour)
+    if not bg_colour then bg_colour = term.getBackgroundColour() end
+    if not text_colour then text_colour = term.getTextColour() end
+    term.setBackgroundColour(bg_colour)
+    term.setTextColour(text_colour)
     term.clear()
     term.setCursorPos(1,1)
+end
+
+local function switchTo(bgColor, textColor) 
+    term.setTextColor(textColor)
+    term.setBackgroundColor(bgColor)
+end
+
+-- Presents the user with a choice.
+-- <first[string]> Text in the first choice
+-- <second[string]> Text in the second choice.
+function utils.choice(first,second, startsOn)
+    if not startsOn then startsOn = 1 end
+    print()
+    print()
+    local choice = startsOn
+    local x,_ = term.getSize()
+    local _,y = term.getCursorPos()
+
+    while true do
+        local cur = term.getBackgroundColour()
+        term.setBackgroundColour(cur)
+
+        term.setCursorPos(1,y-1)
+        term.clearLine()
+
+        term.setCursorPos(1,y)
+        term.clearLine()
+
+        term.setCursorPos(1,y+1)
+        term.clearLine()
+        
+        -- how many chars inbetween options
+        local spacing = 15
+
+        local middle_pos = math.floor(x/2)
+        local start_f = middle_pos - (math.floor(string.len(first)/2)) - spacing
+        local start_s = middle_pos - (math.floor(string.len(second)/2)) + spacing
+        
+        if choice == 1 then
+            switchTo(colours.white, colours.blue)
+            term.setCursorPos(start_f-1, y-1)
+            write(string.rep(" ",string.len(first)+2))
+            term.setCursorPos(start_f-1, y)
+            write("<"..first..">")
+            term.setCursorPos(start_f-1, y+1)
+            write(string.rep(" ",string.len(first)+2))
+            term.setCursorPos(start_s, y)
+            switchTo(colours.blue, colours.white)
+            write(second)
+        else
+            term.setCursorPos(start_f, y)
+            switchTo(colours.blue, colours.white)
+            write(first)
+            switchTo(colours.white, colours.blue)
+            term.setCursorPos(start_s-1, y-1)
+            write(string.rep(" ",string.len(second)+2))
+            term.setCursorPos(start_s-1, y)
+            write("<"..second..">")
+            term.setCursorPos(start_s-1, y+1)
+            write(string.rep(" ",string.len(second)+2))
+            switchTo(colours.blue, colours.white)
+        end
+
+        local _, key, _ = os.pullEvent("key")
+        local pressed = keys.getName(key)
+
+        if pressed == "left" then
+            choice = utils.fif(choice == 1, 2, 1)
+        elseif pressed == "right" then
+            choice = utils.fif(choice == 2, 1, 2)
+        elseif pressed == "enter" then
+            if choice == 1 then
+                return 1
+            else
+                return 2
+            end
+        end
+    end
 end
 
 -- Return a string containing the local time from 
@@ -39,10 +162,10 @@ end
 -- type[config.displayed_logtypes] : logtype to show on screen, before log.
 function utils.log(content, type)
     local log_pattern = "C%d@%s <%s> %s"   
-    if type == config.LOGTYPE_ERROR then
+    if type == constants.LOGTYPE_ERROR then
         printError(log_pattern:
             format(os.getComputerID(),utils.get_local_time(),type,content))
-    elseif type ~= config.LOGTYPE_DEBUG or (type == config.LOGTYPE_DEBUG and config.SHOW_DEBUG) then
+    elseif type ~= constants.LOGTYPE_DEBUG or (type == constants.LOGTYPE_DEBUG and constants.SHOW_DEBUG) then
         print(log_pattern:
             format(os.getComputerID(),utils.get_local_time(),type,content))
     end
@@ -74,7 +197,7 @@ function utils.check_db_size(size)
 
     utils.log(("New item storage database size is %s"):format(formatted_size), INFO)
 
-    return formatted_size, size >= fs.getFreeSpace(config.BASE_PATH)
+    return formatted_size, size >= fs.getFreeSpace(constants.BASE_PATH)
 end
 
 -- Safely opens a file and display a warning if en error occurs.
@@ -256,19 +379,19 @@ function utils.paged_tabulate_fixed(data, headers, widths, right_align, left_spa
             table.getn(current_page_rows) - 2,
             current_page, 
             nb_page_needed), 
-            config.LOGTYPE_INFO)
+            constants.LOGTYPE_INFO)
 
         -- If this was the last page, leave
         if (current_page == nb_page_needed) then 
             -- Prompt the user to hit a key before showing next page.
-            utils.log(("Last page reached. Press any key to exit search..."), config.LOGTYPE_INFO)
+            utils.log(("Last page reached. Press any key to exit search..."), constants.LOGTYPE_INFO)
             os.pullEvent("key")
             utils.reset_terminal()
             return
         end
 
         -- Prompt the user to hit a key before showing next page.
-        utils.log(("%s"):format(PAGED_TABULATE_MESSAGE), config.LOGTYPE_INFO)
+        utils.log(("%s"):format(PAGED_TABULATE_MESSAGE), constants.LOGTYPE_INFO)
         os.pullEvent("key")
 
         utils.reset_terminal()
@@ -335,7 +458,7 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
                     current_page = current_page - 1
                     cursor_pos = 1
                 end
-            elseif pressed_key_name == "x" then
+            elseif pressed_key_name == "backspace" then
                 return nil
             elseif pressed_key_name == "enter" then
                 -- Removing the cursor column
@@ -413,8 +536,8 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
         table.insert(current_page_rows, 1, headers)
 
         -- Prompt the user to hit a key before showing next page.
-        utils.log(("%s"):format("Choose with <UP>, <DOWN>, <LEFT> and <RIGHT>"), config.LOGTYPE_INFO)
-        utils.log(("%s"):format("Confirm with <ENTER>. Cancel with <X>"), config.LOGTYPE_INFO)
+        utils.log(("%s"):format("Choose with <UP>, <DOWN>, <LEFT> and <RIGHT>"), constants.LOGTYPE_INFO)
+        utils.log(("%s"):format("Confirm with <ENTER>. Cancel with <BACKSPACE>"), constants.LOGTYPE_INFO)
 
         print()
 
@@ -427,12 +550,12 @@ function utils.paged_tabulate_fixed_choice(data, headers, widths, right_align, l
             table.getn(current_page_rows) - 2,
             current_page, 
             nb_page_needed), 
-            config.LOGTYPE_INFO
+            constants.LOGTYPE_INFO
         )
 
         -- If this was the last page, leave
         if (current_page == nb_page_needed) then 
-            utils.log(("End of list reached."), config.LOGTYPE_INFO)
+            utils.log(("End of list reached."), constants.LOGTYPE_INFO)
         end
 
         _, key, _ = os.pullEvent("key")
@@ -445,7 +568,7 @@ end
 -- files at the path mentioned in the config file.
 function utils.prepare_registries()
     local registry = {}
-    for _,path in ipairs(config.REG_PATHS) do
+    for _,path in ipairs(constants.REG_PATHS) do
         local reg = utils.get_json_file_as_object(path)
         if not reg then return registry end
         for _,s in ipairs(reg) do
@@ -551,7 +674,7 @@ function utils.add_stack_to_db(database, section, slot, inv_name, details)
         return 
     end
 
-    local stats = utils.get_json_file_as_object(config.STATS_FILE_PATH)
+    local stats = utils.get_json_file_as_object(constants.STATS_FILE_PATH)
     if not stats then
         utils.log("Could not get statistics JSON object.", ERROR)
         return
@@ -676,7 +799,7 @@ function utils.save_database_to_JSON(database)
     -- Overwring the old db if enough space is found
     utils.log("Overwriting old JSON database...", DEBUG)
 
-    if not utils.write_json_string_in_file(config.DATABASE_FILE_PATH, UPDATED_JSON_DB) then
+    if not utils.write_json_string_in_file(constants.DATABASE_FILE_PATH, UPDATED_JSON_DB) then
         return false
     end
 

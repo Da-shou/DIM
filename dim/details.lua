@@ -10,16 +10,16 @@
 -- Created : 24/08/2025
 -- Updated : 25/08/2025
 
-local config = require("lib/config")
+local constants = require("lib/constants")
 local utils = require("lib/utils")
 
-local INFO = config.LOGTYPE_INFO
-local BEGIN = config.LOGTYPE_BEGIN
-local END = config.LOGTYPE_END
-local WARN = config.LOGTYPE_WARNING
-local ERROR = config.LOGTYPE_ERROR
-local DEBUG = config.LOGTYPE_DEBUG
-local TIMER = config.LOGTYPE_TIMER
+local INFO = constants.LOGTYPE_INFO
+local BEGIN = constants.LOGTYPE_BEGIN
+local END = constants.LOGTYPE_END
+local WARN = constants.LOGTYPE_WARNING
+local ERROR = constants.LOGTYPE_ERROR
+local DEBUG = constants.LOGTYPE_DEBUG
+local TIMER = constants.LOGTYPE_TIMER
 
 local function end_program()
     utils.log("Ending details program.",END)
@@ -37,7 +37,7 @@ local ITEM_NBT = arg[2]
 ---@diagnostic disable-next-line: cast-local-type
 if ITEM_NBT == "nil" then ITEM_NBT = nil end
 
-local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+local db = utils.get_json_file_as_object(constants.DATABASE_FILE_PATH)
 if not db then return end_program() end
 
 local total = 0
@@ -136,11 +136,11 @@ while true do
     local r = "RETURN"
 
     local middle_pos = math.floor(x/2)
-    local start_e = middle_pos - (string.len(e) + math.floor(string.len(e)/2)) - spacing
-    local start_r = middle_pos + (string.len(r) + math.floor(string.len(r)/2)) + spacing
+    local start_e = middle_pos - (math.floor(string.len(e)/2)) - spacing
+    local start_r = middle_pos - (math.floor(string.len(r)/2)) + spacing
     
     if choice == 1 then
-        switchTo(colours.red, colours.black)
+        switchTo(colours.green, colours.black)
         term.setCursorPos(start_e-1, y-1)
         write(string.rep(" ",string.len(e)+2))
         term.setCursorPos(start_e-1, y)
@@ -174,7 +174,7 @@ while true do
     elseif pressed == "enter" then
         if choice == 1 then
             if ITEM_NBT == nil then ITEM_NBT = "DEFAULT" end
-            shell.run(("extract %s %s %s"):format(ITEM_ID, "nil", ITEM_NBT))
+            shell.run(("/dim/extract %s %s %s"):format(ITEM_ID, "nil", ITEM_NBT))
             os.queueEvent("quit", "quit")
             break
         else

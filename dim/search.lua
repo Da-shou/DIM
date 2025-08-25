@@ -9,15 +9,15 @@
 -- Created : 17/08/2025
 -- Updated : 24/08/2025
 
-local config = require("lib/config")
+local constants = require("lib/constants")
 local utils = require("lib/utils")
 
-local INFO = config.LOGTYPE_INFO
-local BEGIN = config.LOGTYPE_BEGIN
-local DEBUG = config.LOGTYPE_DEBUG
-local END = config.LOGTYPE_END
-local WARN = config.LOGTYPE_WARNING
-local TIMER = config.LOGTYPE_TIMER
+local INFO = constants.LOGTYPE_INFO
+local BEGIN = constants.LOGTYPE_BEGIN
+local DEBUG = constants.LOGTYPE_DEBUG
+local END = constants.LOGTYPE_END
+local WARN = constants.LOGTYPE_WARNING
+local TIMER = constants.LOGTYPE_TIMER
 
 utils.reset_terminal()
 
@@ -67,7 +67,7 @@ end
 
 -- Opening and unserializing the database for search and storing
 -- it in a lua object called database.
-local database = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+local database = utils.get_json_file_as_object(constants.DATABASE_FILE_PATH)
 if not database then return end
 
 -- Will contain the informations about the items returned from the search.
@@ -138,15 +138,15 @@ if table.getn(display_list) > 0 then
 
     local max = utils.fif(
         display_details,
-        config.MAX_DISPLAY_NAME_LENGTH,
-        config.MAX_DISPLAY_DISPLAYNAME_LENGTH
+        constants.MAX_DISPLAY_NAME_LENGTH,
+        constants.MAX_DISPLAY_DISPLAYNAME_LENGTH
     )
 
     if best > max then
         best = max
     end
 
-    if best > config.MAX_DISPLAY_NAME_LENGTH then best = config.MAX_DISPLAY_NAME_LENGTH end
+    if best > constants.MAX_DISPLAY_NAME_LENGTH then best = constants.MAX_DISPLAY_NAME_LENGTH end
     local string_rows = {}
 
     -- Beginning to print the results of the search
@@ -210,7 +210,7 @@ if choice then
     local choice_index = tonumber(choice[1])
     local choice_nbt = display_list[choice_index].nbt
 
-    shell.run(("details %s %s"):format(choice_id, choice_nbt))
+    shell.run(("/dim/details %s %s"):format(choice_id, choice_nbt))
 
     local eventData = {os.pullEvent()}
     

@@ -11,16 +11,16 @@
 
 -- Getting libraries
 local utils = require("lib/utils")
-local config = require("lib/config")
+local constants = require("lib/constants")
 
 -- Getting all log types
-local DEBUG = config.LOGTYPE_DEBUG
-local WARN = config.LOGTYPE_WARNING
-local ERROR = config.LOGTYPE_ERROR
-local BEGIN = config.LOGTYPE_BEGIN
-local INFO = config.LOGTYPE_INFO
-local END = config.LOGTYPE_END
-local TIMER = config.LOGTYPE_TIMER
+local DEBUG = constants.LOGTYPE_DEBUG
+local WARN = constants.LOGTYPE_WARNING
+local ERROR = constants.LOGTYPE_ERROR
+local BEGIN = constants.LOGTYPE_BEGIN
+local INFO = constants.LOGTYPE_INFO
+local END = constants.LOGTYPE_END
+local TIMER = constants.LOGTYPE_TIMER
 
 utils.reset_terminal()
 
@@ -29,12 +29,18 @@ local start = utils.start_stopwatch()
 utils.log("Beginning insertion...", BEGIN)
 utils.log("Scanning contents of desired input storage...", DEBUG)
 
+local storage_config = utils.get_json_file_as_object(constants.STORAGES_CONFIG_FILE_PATH)
+if not storage_config then 
+    utils.log("Could not find storage config file", ERROR)
+    return
+end
+
 -- Getting the insertion inventory ready
-local IN = config.INPUT_STORAGE_NAME
+local IN = storage_config.input
 local input = peripheral.wrap(IN)
 local input_stacks = input.list()
 
-local inv_names = utils.get_json_file_as_object(config.INVENTORIES_FILE_PATH)
+local inv_names = utils.get_json_file_as_object(constants.INVENTORIES_FILE_PATH)
 if not inv_names then
     utils.log([[No inventories were found in the inventories list. 
     Verify that your inventories are connected to the network and that the inventory program was run
@@ -157,13 +163,13 @@ local input_inventory_stack_count = get_input_stack_count()
 local progress = 0
 local input_stack_index = 0
 
-local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+local db = utils.get_json_file_as_object(constants.DATABASE_FILE_PATH)
 if not db then
     utils.log("Database file could not be found.", ERROR) 
     return 
 end
 
-local stats = utils.get_json_file_as_object(config.STATS_FILE_PATH)
+local stats = utils.get_json_file_as_object(constants.STATS_FILE_PATH)
 if not stats then 
     utils.log("Statistics file could not be found.", ERROR)
     return 
@@ -344,7 +350,7 @@ end
 
 -- Writing the stats object to a new file.
 local JSON_STATS = textutils.serializeJSON(stats)
-utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
+utils.write_json_string_in_file(constants.STATS_FILE_PATH, JSON_STATS)
 
 local stop = utils.stop_stopwatch(start)
 

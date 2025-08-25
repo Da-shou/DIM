@@ -9,25 +9,36 @@
 -- Created : 17/08/2025
 -- Updated : 24/08/2025
 
-local config = require("lib/config")
+local constants = require("lib/constants")
 local utils = require("lib/utils")
 
-local INFO = config.LOGTYPE_INFO
-local ERROR = config.LOGTYPE_ERROR
-local DEBUG = config.LOGTYPE_DEBUG
-local BEGIN = config.LOGTYPE_BEGIN
-local END = config.LOGTYPE_END
-local TIMER = config.LOGTYPE_TIMER
+local INFO = constants.LOGTYPE_INFO
+local ERROR = constants.LOGTYPE_ERROR
+local DEBUG = constants.LOGTYPE_DEBUG
+local BEGIN = constants.LOGTYPE_BEGIN
+local END = constants.LOGTYPE_END
+local TIMER = constants.LOGTYPE_TIMER
 
-local LM = config.LOADING_MODULO
+local LM = constants.LOADING_MODULO
 
-local INPUT = config.INPUT_STORAGE_NAME
-local OUTPUT = config.OUTPUT_STORAGE_NAME
+local start = utils.start_stopwatch()
+
+utils.log("Starting inventory program...", BEGIN)
+utils.log("Searching for inventories on the network...", INFO)
 
 -- Getting the peripherals
 local names = peripheral.getNames()
 
 utils.reset_terminal()
+
+local storage_config = utils.get_json_file_as_object(constants.STORAGES_CONFIG_FILE_PATH)
+if not storage_config then 
+    utils.log("Could not find storage config file", ERROR)
+    return
+end
+
+local INPUT = storage_config.input
+local OUTPUT = storage_config.output
 
 -- Parses through every peripherals in the network and if
 -- their types is the storage type specifies, adds them
@@ -35,21 +46,14 @@ utils.reset_terminal()
 -- in the config file.
 function get_inventories()
     local results = {}
-    for i,name in ipairs(names) do
+    for _,name in ipairs(names) do
         local type = peripheral.getType(name)
-        if type == config.STORAGE_TYPE and name ~= INPUT and name ~= OUTPUT then
+        if type == storage_config.type and name ~= INPUT and name ~= OUTPUT then
             table.insert(results, name)
         end     
     end
     return results, table.getn(results) 
 end
-
-local start = utils.start_stopwatch()
-
-utils.log("Starting inventory program...", BEGIN)
-utils.log("Searching for inventories on the network...", INFO)
-
-
 
 -- Getting the inventories and the count
 local inv_names, inv_count = get_inventories()
@@ -57,6 +61,7 @@ local inv_names, inv_count = get_inventories()
 -- Creating the lua object that will hold all of our
 -- item data which will then be serialized to JSON.
 local database = {}
+
 local stats = {
     total_slots = 0,
     used_slots = 0
@@ -164,11 +169,11 @@ local JSON_NAMES = textutils.serializeJSON(inv_names)
 
 -- Writing the inventory names to a JSON file for future use by other
 -- programs.
-utils.write_json_string_in_file(config.INVENTORIES_FILE_PATH, JSON_NAMES)
+utils.write_json_string_in_file(constants.INVENTORIES_FILE_PATH, JSON_NAMES)
 
 -- Writing the stats object to a new file.
 local JSON_STATS = textutils.serializeJSON(stats)
-utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
+utils.write_json_string_in_file(constants.STATS_FILE_PATH, JSON_STATS)
 
 local stop = utils.stop_stopwatch(start)
 

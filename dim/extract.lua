@@ -9,17 +9,17 @@
 -- Created : 19/08/2025
 -- Updated : 24/08/2025
 
-local config = require("lib/config")
+local constants = require("lib/constants")
 local utils = require("lib/utils")
 local completion = require "cc.completion"
 
-local INFO = config.LOGTYPE_INFO
-local BEGIN = config.LOGTYPE_BEGIN
-local END = config.LOGTYPE_END
-local WARN = config.LOGTYPE_WARNING
-local ERROR = config.LOGTYPE_ERROR
-local DEBUG = config.LOGTYPE_DEBUG
-local TIMER = config.LOGTYPE_TIMER
+local INFO = constants.LOGTYPE_INFO
+local BEGIN = constants.LOGTYPE_BEGIN
+local END = constants.LOGTYPE_END
+local WARN = constants.LOGTYPE_WARNING
+local ERROR = constants.LOGTYPE_ERROR
+local DEBUG = constants.LOGTYPE_DEBUG
+local TIMER = constants.LOGTYPE_TIMER
 
 utils.reset_terminal()
 
@@ -28,6 +28,12 @@ utils.log("Beginning extraction program.", BEGIN)
 
 local choices = utils.prepare_registries()
 local function input_completer (text) return completion.choice(text, choices) end
+
+local storage_config = utils.get_json_file_as_object(constants.STORAGES_CONFIG_FILE_PATH)
+if not storage_config then 
+    utils.log("Could not find storage config file", ERROR)
+    return
+end
 
 local INPUT_ID = arg[1]
 local INPUT_COUNT = nil
@@ -46,7 +52,7 @@ local function end_program()
 end
 
 -- Getting the extraction inventory ready
-local OUT = config.OUTPUT_STORAGE_NAME
+local OUT = storage_config.output
 local output = peripheral.wrap(OUT)
 
 if not INPUT_ID then
@@ -68,13 +74,13 @@ for i,choice in ipairs(choices) do
 end
 
 -- Getting the JSON database as a Lua object
-local db = utils.get_json_file_as_object(config.DATABASE_FILE_PATH)
+local db = utils.get_json_file_as_object(constants.DATABASE_FILE_PATH)
 if not db then
     utils.log("Database file was not found.", ERROR)
     return 
 end
 
-local stats = utils.get_json_file_as_object(config.STATS_FILE_PATH)
+local stats = utils.get_json_file_as_object(constants.STATS_FILE_PATH)
 if not stats then
     utils.log("Stats file was not found.", ERROR)
     return 
@@ -164,11 +170,11 @@ if storage_total > 1 then
     if INPUT_COUNT:match("^%d+$") then
         utils.log("Correctly got digit(s) in input.", DEBUG)
         REQUEST_COUNT = tonumber(INPUT_COUNT)
-        if REQUEST_COUNT < config.MIN_EXTRACTION_REQUEST_COUNT or REQUEST_COUNT > config.MAX_EXTRACTION_REQUEST_COUNT then
+        if REQUEST_COUNT < constants.MIN_EXTRACTION_REQUEST_COUNT or REQUEST_COUNT > constants.MAX_EXTRACTION_REQUEST_COUNT then
             utils.log(([[Number entered is too low/high ! 
                 Please enter a number between %d and %d]]):format(
-                config.MIN_EXTRACTION_REQUEST_COUNT, 
-                config.MAX_EXTRACTION_REQUEST_COUNT), WARN
+                constants.MIN_EXTRACTION_REQUEST_COUNT, 
+                constants.MAX_EXTRACTION_REQUEST_COUNT), WARN
             )
             if end_program() then return end
         else
@@ -361,7 +367,7 @@ end
 
 -- Writing the stats object to a new file.
 local JSON_STATS = textutils.serializeJSON(stats)
-utils.write_json_string_in_file(config.STATS_FILE_PATH, JSON_STATS)
+utils.write_json_string_in_file(constants.STATS_FILE_PATH, JSON_STATS)
 
 local stop = utils.stop_stopwatch(start)
 
