@@ -15,7 +15,7 @@ constants.dim_version = "Alpha 0.1.5"
 -- Base path of the program
 constants.BASE_PATH = "/dim"
 
-if fs.exists("/disk") then
+if fs.exists("/disk/dim") then
 	constants.BASE_PATH = "/disk/dim"
 end
 
