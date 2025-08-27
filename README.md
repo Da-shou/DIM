@@ -24,6 +24,5 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 |-|-
 |❌|Create an account system, which keeps tracks of who has which items.
 |❌|After a login, actions and disconnect, the history of insertions and extractions is kept.
-|❌|The last actions can be printed on paper.
 
 For balance reasons that I am the sole judge of, this is made to only work on wired networks.
