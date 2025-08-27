@@ -454,7 +454,6 @@ if exit_code == 1 then
     utils.log("An error occured during installation.", ERROR)
 end
 
-shell.run("rm utils.lua")
 local drive = peripheral.find("drive")
 drive.ejectDisk()
 os.reboot()
