@@ -12,6 +12,12 @@ This is a small ComputerCraft: Tweaked projet I am working on. The goal is to ma
 |✔|Find a nice way for the user to extract unique items.
 |**WIP**|See miscelleanous storage statistics.
 |✔|Make a user-friendly interface.
+|❌|Print each action's results on a printer page.
+|❌|Prettify and format the search tables as well as the details screen with colors and spacing.
+|❌|Replace all strings used in the program with lang files entries to support changing languages.
+|❌|Make a reusable menu and buttons system.
+|❌|Play speaker sounds corresponding to starting, processing and ending a request.
+|❌|Add an error sound.
 
 ### ⚙ Secondary goals
 |Status|Goal|
