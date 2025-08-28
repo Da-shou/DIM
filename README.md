@@ -2,6 +2,11 @@
 ## A simple and effective item storage system
 This is a small ComputerCraft: Tweaked projet I am working on. The goal is to make an effective item managing system using only this very mod.
 
+### How to use DIM ?
+Simply download the latest release source code, put it on a computercraft disk (You will need a bigger disk size than the default).
+Once that's done, insert the disk in a disk drive. From the computer connected to the drive, run the setup.lua program from within the disk.
+Go through the setup program. If you have enough storage, DIM will be installed on your computer, your disk will automatically eject and you can start enjoying DIM !
+
 ### ⛏ Primary goals
 |Status|Goal|
 |-|-
