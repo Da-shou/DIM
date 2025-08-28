@@ -44,9 +44,10 @@ function Installation()
 
     -- copying the files from the install disk
     if not shell.run("cp /disk/dim/ /dim") then return 1 end
-
-    local JSON_STORAGE_CONFIG = textutils.serializeJSON(storage_config)
-    utils.write_json_string_in_file(constants.STORAGES_CONFIG_FILE_PATH, JSON_STORAGE_CONFIG)
+    
+    settings.load()
+    settings.set("dim.config", storage_config)
+    settings.save()
 
     local startup_file = utils.open_file("/startup.lua", "w")
     if not startup_file then return 1 end
@@ -94,8 +95,6 @@ function Installation()
         local pressed = keys.getName(key)
         if pressed == "enter" then return 0 end
     end
-
-    return 1
 end
 
 function PreInstallation()
@@ -454,7 +453,9 @@ if exit_code == 1 then
     utils.log("An error occured during installation.", ERROR)
 end
 
-shell.run("rm utils.lua")
 local drive = peripheral.find("drive")
 drive.ejectDisk()
+print()
+utils.print_centered(translations.setup_installation_finished_3)
+os.sleep(1)
 os.reboot()

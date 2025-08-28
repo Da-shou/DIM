@@ -31,14 +31,9 @@ local names = peripheral.getNames()
 
 utils.reset_terminal()
 
-local storage_config = utils.get_json_file_as_object(constants.STORAGES_CONFIG_FILE_PATH)
-if not storage_config then 
-    utils.log("Could not find storage config file", ERROR)
-    return
-end
-
-local INPUT = storage_config.input
-local OUTPUT = storage_config.output
+local dim_config = settings.get("dim.config")
+local INPUT = dim_config.input
+local OUTPUT = dim_config.output
 
 -- Parses through every peripherals in the network and if
 -- their types is the storage type specifies, adds them
@@ -48,7 +43,7 @@ function get_inventories()
     local results = {}
     for _,name in ipairs(names) do
         local type = peripheral.getType(name)
-        if type == storage_config.type and name ~= INPUT and name ~= OUTPUT then
+        if type == dim_config.type and name ~= INPUT and name ~= OUTPUT then
             table.insert(results, name)
         end     
     end

@@ -29,14 +29,8 @@ local start = utils.start_stopwatch()
 utils.log("Beginning insertion...", BEGIN)
 utils.log("Scanning contents of desired input storage...", DEBUG)
 
-local storage_config = utils.get_json_file_as_object(constants.STORAGES_CONFIG_FILE_PATH)
-if not storage_config then 
-    utils.log("Could not find storage config file", ERROR)
-    return
-end
-
 -- Getting the insertion inventory ready
-local IN = storage_config.input
+local IN = settings.get("dim.config").input
 local input = peripheral.wrap(IN)
 local input_stacks = input.list()
 

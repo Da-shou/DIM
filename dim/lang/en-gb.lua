@@ -70,5 +70,6 @@ translations.setup_installation_done = "All done !"
 translations.setup_installation_error = "An error occured during installation."
 translations.setup_installation_finished_1 = "DIM was successfully installed on your computer."
 translations.setup_installation_finished_2 = "Pressing <ENTER> will reboot your computer."
+translations.setup_installation_finished_3 = "Rebooting..."
 
 return translations
