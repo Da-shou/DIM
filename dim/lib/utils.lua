@@ -80,7 +80,8 @@ end
 -- Presents the user with a choice.
 -- <first[string]> Text in the first choice
 -- <second[string]> Text in the second choice.
-function utils.choice(first,second, startsOn)
+function utils.choice(first,second, startsOn, spacing)
+    if not spacing then spacing = 10 end
     if not startsOn then startsOn = 1 end
     print()
     print()
@@ -100,9 +101,6 @@ function utils.choice(first,second, startsOn)
 
         term.setCursorPos(1,y+1)
         term.clearLine()
-        
-        -- how many chars inbetween options
-        local spacing = 15
 
         local middle_pos = math.floor(x/2)
         local start_f = middle_pos - (math.floor(string.len(first)/2)) - spacing

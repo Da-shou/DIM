@@ -10,16 +10,29 @@
 
 local constants = require("lib/constants")
 local utils = require("lib/utils")
-
+local window_utils = require("lib/window-utils")
+local translations = require("lang/en-gb")
 local INFO = constants.LOGTYPE_INFO
+local screen = term.native()
 
 ::home::
+term.setBackgroundColour(colours.black)
+term.setTextColour(colours.white)
 local file_logo = utils.open_file(constants.ASCII_LOGO_FILE_PATH, "r")
 if not file_logo then return end
 
+-- If first boot, then run inventory at startup.
+if settings.load() and settings.get("dim.scanned") == false then
+    shell.run("/dim/inventory.lua")
+    -- Auto-pressing enter for first inventory
+    settings.set("dim.scanned", true)
+    settings.save()
+    os.queueEvent("key", 13, false)
+end
+
 utils.reset_terminal()
 
-local max_x, _ = term.getSize()
+local max_x, max_y = term.getSize()
 local x_start = math.floor(max_x/2)
 local y_start = 2
 while true do
@@ -42,7 +55,6 @@ local function main_menu()
         term.setBackgroundColor(bgColor)
     end
 
-    
     local choice_x = 0
     local choice_y = 0
     
@@ -175,7 +187,26 @@ while true do
     local choice_x, choice_y = main_menu()
     if choice_x == 0 then
         if choice_y == 0 then
-            shell.run("/dim/inventory.lua")
+            -- Making the window
+            local confirm_popup = window_utils.centered_window(
+                translations.home_confirm_inventory_window_title,
+                {translations.home_confirm_inventory_window_content},
+                math.floor(max_x/2), math.floor(max_y/1.75),
+                colours.blue, colors.white, 2, false
+            )
+
+            -- Adding a choice to it
+            local choice = window_utils.centered_window_choice(confirm_popup, translations.home_confirm_inventory_NO, translations.home_confirm_inventory_YES)
+            term.redirect(screen)
+
+            term.setBackgroundColour(colours.black)
+            term.setTextColour(colours.white)
+
+            if choice == 2 then
+                shell.run("/dim/inventory.lua")
+            else
+                goto home
+            end
         end
         if choice_y == 1 then
             utils.reset_terminal()

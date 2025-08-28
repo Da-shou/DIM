@@ -68,8 +68,18 @@ translations.setup_installation_title = "INSTALLING"
 translations.setup_installation_loading_label = "Installing DIM on local disk..."
 translations.setup_installation_done = "All done !"
 translations.setup_installation_error = "An error occured during installation."
+translations.setup_installation_step_1 = "Starting installation."
+translations.setup_installation_step_2 = "Copying files..."
+translations.setup_installation_step_3 = "Adding computer settings..."
+translations.setup_installation_step_4 = "Creating startup program..."
+translations.setup_installation_window_title = "SUCCESS"
 translations.setup_installation_finished_1 = "DIM was successfully installed on your computer."
 translations.setup_installation_finished_2 = "Pressing <ENTER> will reboot your computer."
 translations.setup_installation_finished_3 = "Rebooting..."
+
+translations.home_confirm_inventory_window_title = "CONFIRMATION"
+translations.home_confirm_inventory_window_content = "Running inventory program again must only be done if storage was manually altered !\n\nDepending on the size and items in your storage, this operation may take a long time.\n\nDo you want to run the inventory program ?"
+translations.home_confirm_inventory_YES = "YES"
+translations.home_confirm_inventory_NO = "NO"
 
 return translations

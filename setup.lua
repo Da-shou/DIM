@@ -10,7 +10,7 @@
 -- Updated : 25/08/2025
 
 local constants = require("dim/lib/constants")
-local utils = require("utils")
+local utils = require("setup_utils")
 local translations = require("dim/"..constants.CHOSEN_LANG)
 local completion = require("cc.completion")
 
@@ -24,17 +24,44 @@ local SPEAKER_NAME = nil
 local PRINTER_NAME = nil
 
 function Installation()
-    utils.reset_terminal()
+    -- total_steps = number of calls to update_progress()
+    local total_steps = 10
+    local nb_logs = 0
+    local progress = 0
+    local x,_ = term.getSize()
+    local loading_bar_w = math.floor(x/2)
 
+    local function updateProgress()
+        utils.loading_bar(progress, loading_bar_w, colors.lightBlue, colors.white)
+        progress = progress + (1/total_steps)
+        os.sleep(0.1)
+    end
+
+    
+    utils.reset_terminal()
+    
     print()
     utils.print_align_left(translations.setup_installation_title)
     print()
-
+    
     print()
     utils.print_align_left(translations.setup_installation_loading_label)
     print()
+    
+    
+    local x_loading,y_loading = term.getCursorPos()
+    
+    local function logStep(step)
+        term.setCursorPos(x_loading, y_loading+4+nb_logs)
+        utils.print_align_left(step)
+        nb_logs = nb_logs + 1
+        term.setCursorPos(x_loading, y_loading)
+    end
 
-    local storage_config = {
+    updateProgress()
+    logStep(translations.setup_installation_step_1)
+
+    local config = {
         input=INPUT_NAME,
         output=OUTPUT_NAME,
         type=STORAGE_TYPE,
@@ -44,51 +71,50 @@ function Installation()
 
     -- copying the files from the install disk
     if not shell.run("cp /disk/dim/ /dim") then return 1 end
-    
+
+    updateProgress()
+    logStep(translations.setup_installation_step_2)
+
     settings.load()
-    settings.set("dim.config", storage_config)
+    updateProgress()
+
+    settings.set("dim.config", config)
+    updateProgress()
+
+    settings.set("dim.scanned", false)
+    updateProgress()
+
     settings.save()
+    updateProgress()
+    logStep(translations.setup_installation_step_3)
 
     local startup_file = utils.open_file("/startup.lua", "w")
     if not startup_file then return 1 end
+    updateProgress()
 
     utils.write_file(startup_file, [[shell.run("/dim/home")]])
+    updateProgress()
 
-    local chars = 0
-    local progress = 0
-    local fake_loading_div = 27
-
-    local x,_ = term.getSize()
-    local loading_bar_w = math.floor(x/2)
-
-    for i=1,fake_loading_div do
-        term.clearLine()
-        utils.print_align_left(string.rep(" ", loading_bar_w), colors.lightBlue, colors.lightBlue)
-        local _,y = term.getCursorPos()
-        term.setCursorPos(1,y-1)
-        utils.print_align_left(string.rep(" ", chars), colors.white, colors.white)
-        chars = math.floor((i/27)*loading_bar_w)
-        progress = (i/27) * 100
-        utils.print_align_left(("%.1f%%"):format(progress))
-        local _,y = term.getCursorPos()
-        term.setCursorPos(1,y-2)
-        os.sleep(0.1)
-    end
+    utils.close_file(startup_file)
+    updateProgress()
+    logStep(translations.setup_installation_step_4)
 
     term.clearLine()
     utils.print_align_left(string.rep(" ", loading_bar_w), colors.white, colors.lightBlue)
+    print()
     utils.print_align_left("100.0%")
-    
-    print()
-    print()
-    utils.print_align_left(translations.setup_installation_done)
-
-    print()
     print()
     print()
 
-    utils.print_align_left(translations.setup_installation_finished_1)
-    utils.print_align_left(translations.setup_installation_finished_2)
+    logStep(translations.setup_installation_done)
+
+    utils.reset_terminal(colours.black, colours.white)
+
+    utils.centered_window(
+        translations.setup_installation_window_title,
+        {translations.setup_installation_finished_1,"\n",translations.setup_installation_finished_2},
+        colors.blue, colors.white, 2
+    )
 
     while true do
         local _, key, _ = os.pullEvent("key")
@@ -455,7 +481,8 @@ end
 
 local drive = peripheral.find("drive")
 drive.ejectDisk()
+term.setTextColor(colours.white)
 print()
-utils.print_centered(translations.setup_installation_finished_3)
+print(translations.setup_installation_finished_3)
 os.sleep(1)
 os.reboot()

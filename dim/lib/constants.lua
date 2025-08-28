@@ -10,7 +10,7 @@
 
 local constants = {}
 
-constants.dim_version = "Alpha 0.1.5"
+constants.dim_version = "Alpha 0.1.2"
 
 -- Base path of the program
 constants.BASE_PATH = "/dim"
