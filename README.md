@@ -17,6 +17,7 @@ Go through the setup program. If you have enough storage, DIM will be installed 
 |✔|Find a nice way for the user to extract unique items.
 |**WIP**|See miscelleanous storage statistics.
 |✔|Make a user-friendly interface.
+|✔|Edit from my Arch laptop.
 |❌|Print each action's results on a printer page.
 |❌|Prettify and format the search tables as well as the details screen with colors and spacing.
 |❌|Replace all strings used in the program with lang files entries to support changing languages.
