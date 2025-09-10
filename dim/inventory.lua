@@ -47,7 +47,7 @@ function get_inventories()
             table.insert(results, name)
         end     
     end
-    return results, table.getn(results) 
+    return results, table.getn(results)
 end
 
 -- Getting the inventories and the count
