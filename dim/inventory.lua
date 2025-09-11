@@ -14,13 +14,13 @@ local utils = require("lib/utils")
 
 local INFO = constants.LOGTYPE_INFO
 local ERROR = constants.LOGTYPE_ERROR
-local DEBUG = constants.LOGTYPE_DEBUG
 local BEGIN = constants.LOGTYPE_BEGIN
 local END = constants.LOGTYPE_END
 local TIMER = constants.LOGTYPE_TIMER
 
 local LM = constants.LOADING_MODULO
 
+-- Start timer
 local start = utils.start_stopwatch()
 
 utils.log("Starting inventory program...", BEGIN)
